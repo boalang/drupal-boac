@@ -98,8 +98,9 @@ if (strfind("vaccine", lowercase(p.metadata.title)) >= 0) {
 
 			foreach (j: int; !contains(stopwords, paragraphWords[j]))
 				if (len(paragraphWords[j]) > 5)
-					if (!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", paragraphWords[j]) && match(`.*:*$`, paragraphWords[j]))
-						add(bodyWords, paragraphWords[j]);
+					if (!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", paragraphWords[j]))
+						if (match(`.*:*$`, paragraphWords[j]))
+							add(bodyWords, paragraphWords[j]);
 		}
 	}
 
