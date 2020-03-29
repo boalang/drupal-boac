@@ -25,10 +25,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q1'] = t('What 100 words appear in the most paper abstracts?');
-$example_jobs['q1'] = 55;
+$example_names['q1'] = t('What 100 words appear in the most number of paper abstracts?');
+$example_jobs['q1'] = 149;
 $examples['q1'] = <<<BOA
-# What 100 words appear in the most paper abstracts?
+# What 100 words appear in the most number of paper abstracts?
 p: Paper = input;
 
 o: output top(100) of string weight int;
@@ -38,13 +38,13 @@ stopwords: set of string = stop_words();
 abstractWords: set of string;
 
 foreach (i: int; def(p.abstract[i])) {
-	paragraphWords: array of string = splitall(p.abstract[i].text, " ");
+	paragraphWords: array of string = splitall(lowercase(p.abstract[i].text), " ");
 
 	foreach (j: int; !contains(stopwords, paragraphWords[j]))
 		add(abstractWords, paragraphWords[j]);
 }
 
-words := keys(abstractWords);
+words := values(abstractWords);
 foreach (k: int; def(words[k]))
 	o << words[k] weight 1;
 BOA;
