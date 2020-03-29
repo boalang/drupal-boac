@@ -30,6 +30,13 @@ function boa_result($jobId) {
 
 	$content = '';
 
+	$content .= <<<CSS
+<style type="text/css" media="all">
+.resultlist {
+}
+</script>
+CSS;
+
 	fakeRunning($record);
 
 	if ($record->compiler_status == 0 || $record->compiler_status == 1 ||
@@ -184,7 +191,7 @@ function generate_content($jobId) {
 
 	if ($record->hadoop_status == 2) {
 		$content .= '<h2>Result</h2>';
-		$content .= get_output($jobId);
+		$content .= "<ul class=\"resultlist\">\n" . get_output($jobId) . "</ul>\n";
 	}
 
 	# -----------------------------------------------
@@ -211,7 +218,7 @@ function get_output($jobId) {
 			$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
 			foreach ($rows as $row) {
 				$s = linkify(htmlspecialchars($row), array('target' => '_blank'));
-				$content .= substr($s, strpos($s, '[] = ') + 5) . "<br/>\n";
+				$content .= "\t<li>" . substr($s, strpos($s, '[] = ') + 5) . "</li>\n";
 			}
 			if ($trimmed)
 				$content .= "... remaining output not shown, please <a href=\"?q=boa/job/$jobId/download\">download output</a>.\n";
