@@ -59,30 +59,22 @@ p: Paper = input;
 
 o: output top(100) of string weight int;
 
-bodyStore: string;
-arrBody: array of string;
-storeKeywords: map[int] of string;
-stopwords: set of string =stop_words();
-l: int = 0;
+stopwords: set of string = stop_words();
+# store all words used in this paper's body
+bodyWords: set of string;
 
 foreach (i: int; def(p.body_text[i])) {
 	foreach (m: int; def(p.body_text[i].body[m])) {
-		bodyStore = p.body_text[i].body[m].text;
+		paragraphWords: array of string = splitall(lowercase(p.body_text[i].body[m].text), " ");
 
-        arrBody = splitall(bodyStore, " ");
-
-        foreach (j: int; def(arrBody[j])) {
-            if (!contains(stopwords,arrBody[j])) {
-                storeKeywords[l] = arrBody[j];
-                l = l + 1;
-            }
-        }
-    }
+		foreach (j: int; !contains(stopwords, paragraphWords[j]))
+			add(bodyWords, paragraphWords[j]);
+	}
 }
 
-foreach (k: int; def(storeKeywords[k])) {
-	o << storeKeywords[k] weight 1;
-}
+words := values(bodyWords);
+foreach (k: int; def(words[k]))
+	o << words[k] weight 1;
 BOA;
 
 # ------------------------------------------------------------------------------------ #
@@ -105,20 +97,20 @@ if (strfind("vaccine", p.metadata.title) >= 0) {
 	foreach (i: int; def(p.body_text[i])) {
 		foreach (m: int; def(p.body_text[i].body[m])) {
 			bodyStore = p.body_text[i].body[m].text;
-            arrBody = splitall(bodyStore, " ");
+			arrBody = splitall(bodyStore, " ");
 
-            foreach (j: int; def(arrBody[j])) {
-                if (!contains(stopwords, lowercase(string(arrBody[j])))) {
-                    if (len(arrBody[j]) > 5) {
-                        if ((!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", lowercase(string(arrBody[j])))) && (match("(.*:*)$", lowercase(string(arrBody[j])))))
-                        {
-                            storeKeywords[l] = string(arrBody[j]);
-                            l = l + 1;
-                        }
-                    }
-                }
-            }
-        }
+			foreach (j: int; def(arrBody[j])) {
+				if (!contains(stopwords, lowercase(string(arrBody[j])))) {
+					if (len(arrBody[j]) > 5) {
+						if ((!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", lowercase(string(arrBody[j])))) && (match("(.*:*)$", lowercase(string(arrBody[j])))))
+						{
+							storeKeywords[l] = string(arrBody[j]);
+							l = l + 1;
+						}
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -144,22 +136,22 @@ l: int = 0;
 
 foreach (i: int; def(p.body_text[i])) {
 	foreach (m: int; def(p.body_text[i].body[m])) {
-        bodyStore = p.body_text[i].body[m].text;
-        arrBody = splitall(bodyStore, " ");
+		bodyStore = p.body_text[i].body[m].text;
+		arrBody = splitall(bodyStore, " ");
 
-        foreach (j: int; def(arrBody[j])) {
-            if (!contains(stopwords, lowercase(string(arrBody[j])))) {
-                if (len(arrBody[j]) > 3) {
-                    if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", lowercase(string(arrBody[j])))) {
-                        if (match("(.*vir)$", lowercase(string(arrBody[j])))) {
-                            storeKeywords[l] = string(arrBody[j]);
-                            l = l + 1;
-                        }
-                    }
-                }
-            }
-        }
-    }
+		foreach (j: int; def(arrBody[j])) {
+			if (!contains(stopwords, lowercase(string(arrBody[j])))) {
+				if (len(arrBody[j]) > 3) {
+					if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", lowercase(string(arrBody[j])))) {
+						if (match("(.*vir)$", lowercase(string(arrBody[j])))) {
+							storeKeywords[l] = string(arrBody[j]);
+							l = l + 1;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 foreach (k: int; def(storeKeywords[k]))
@@ -182,19 +174,19 @@ pulmonary: output collection of string;
 absStore: string;
 
 foreach (i: int; def(p.abstract[i])) {
-    absStore = p.abstract[i].text;
-    if (((strfind("smoke", lowercase(absStore)) >= 0)||(strfind("smoking", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
-        smoke << p.metadata.title;
-    }
-    if (((strfind("pregnant", lowercase(absStore)) >= 0)||(strfind("pregnancy", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
-        pregnant << p.metadata.title;
-    }
-    if (((strfind("neonatal", lowercase(absStore)) >= 0)||(strfind("neo-natal", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
-        neonatal << p.metadata.title;
-    }
-    if ((strfind("pulmonary", lowercase(absStore)) >= 0) && (strfind("risk", lowercase(absStore)) >= 0)) {
-        pulmonary << p.metadata.title;
-    }
+	absStore = p.abstract[i].text;
+	if (((strfind("smoke", lowercase(absStore)) >= 0)||(strfind("smoking", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
+		smoke << p.metadata.title;
+	}
+	if (((strfind("pregnant", lowercase(absStore)) >= 0)||(strfind("pregnancy", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
+		pregnant << p.metadata.title;
+	}
+	if (((strfind("neonatal", lowercase(absStore)) >= 0)||(strfind("neo-natal", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
+		neonatal << p.metadata.title;
+	}
+	if ((strfind("pulmonary", lowercase(absStore)) >= 0) && (strfind("risk", lowercase(absStore)) >= 0)) {
+		pulmonary << p.metadata.title;
+	}
 }
 BOA;
 
@@ -217,28 +209,28 @@ medication: output collection of string;
 absStore: string;
 
 foreach (i: int; def(p.abstract[i])) {
-    absStore = p.abstract[i].text;
-    if ((strfind("nursing", lowercase(absStore)) >= 0)||(strfind("long term care", lowercase(absStore)) >= 0)) {
-        nursing << p.metadata.title;
-    }
-    if ((strfind("ards", lowercase(absStore)) >= 0)||(strfind("acute respiratory distress syndrome", lowercase(absStore)) >= 0)) {
-        ards << p.metadata.title;
-    }
-    if ((strfind("ecmo", lowercase(absStore)) >= 0)||(strfind("extracorporeal membrane oxygenation", lowercase(absStore)) >= 0)) {
-        ecmo << p.metadata.title;
-    }
-    if ((strfind("ventilation", lowercase(absStore)) >= 0)) {
-        ventilation << p.metadata.title;
-    }
-    if ((strfind("n95", lowercase(absStore)) >= 0)) {
-        n95 << p.metadata.title;
-    }
-    if ((strfind("eua", lowercase(absStore)) >= 0)||(strfind("clia", lowercase(absStore)) >= 0)) {
-        regulatory << p.metadata.title;
-    }
-    if ((strfind("medication", lowercase(absStore)) >= 0) && (strfind("oral", lowercase(absStore)) >= 0)) {
-        medication << p.metadata.title;
-    }
+	absStore = p.abstract[i].text;
+	if ((strfind("nursing", lowercase(absStore)) >= 0)||(strfind("long term care", lowercase(absStore)) >= 0)) {
+		nursing << p.metadata.title;
+	}
+	if ((strfind("ards", lowercase(absStore)) >= 0)||(strfind("acute respiratory distress syndrome", lowercase(absStore)) >= 0)) {
+		ards << p.metadata.title;
+	}
+	if ((strfind("ecmo", lowercase(absStore)) >= 0)||(strfind("extracorporeal membrane oxygenation", lowercase(absStore)) >= 0)) {
+		ecmo << p.metadata.title;
+	}
+	if ((strfind("ventilation", lowercase(absStore)) >= 0)) {
+		ventilation << p.metadata.title;
+	}
+	if ((strfind("n95", lowercase(absStore)) >= 0)) {
+		n95 << p.metadata.title;
+	}
+	if ((strfind("eua", lowercase(absStore)) >= 0)||(strfind("clia", lowercase(absStore)) >= 0)) {
+		regulatory << p.metadata.title;
+	}
+	if ((strfind("medication", lowercase(absStore)) >= 0) && (strfind("oral", lowercase(absStore)) >= 0)) {
+		medication << p.metadata.title;
+	}
 }
 BOA;
 
