@@ -79,10 +79,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q3'] = t('What are the 500 most uncommon words in the papers related to vaccines?');
+$example_names['q3'] = t('What 500 words appear in the least number of paper bodies for papers with vaccine in the title?');
 $example_jobs['q3'] = 96;
 $examples['q3'] = <<<BOA
-# What are the 500 most uncommon words in the papers related to vaccines?
+# What 500 words appear in the least number of paper bodies for papers with vaccine in the title?
 p: Paper = input;
 
 o: output bottom(500) of string weight int;
@@ -98,7 +98,7 @@ if (strfind("vaccine", lowercase(p.metadata.title)) >= 0) {
 
 			foreach (j: int; !contains(stopwords, paragraphWords[j]))
 				if (len(paragraphWords[j]) > 5)
-					if (!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", paragraphWords[j]) && match(`(.*:*)$`, paragraphWords[j]))
+					if (!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", paragraphWords[j]) && match(`.*:*$`, paragraphWords[j]))
 						add(bodyWords, paragraphWords[j]);
 		}
 	}
@@ -111,10 +111,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q4'] = t('What are the most used antivirals?');
+$example_names['q4'] = t('What are the most mentioned antivirals?');
 $example_jobs['q4'] = 97;
 $examples['q4'] = <<<BOA
-# What are the most used antivirals?
+# What are the most mentioned antivirals?
 p: Paper = input;
 
 o: output bottom(500) of string weight int;
@@ -128,10 +128,10 @@ foreach (i: int; def(p.body_text[i])) {
 		paragraphWords: array of string = splitall(lowercase(p.body_text[i].body[m].text), " ");
 
 		foreach (j: int; !contains(stopwords, paragraphWords[j]))
-            if (len(paragraphWords[j]) > 3)
-                if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", paragraphWords[j]))
-                    if (match("(.*vir)$", paragraphWords[j]))
-                        add(bodyWords, paragraphWords[j]);
+			if (len(paragraphWords[j]) > 3)
+				if (match(".*vir$", paragraphWords[j]))
+					if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", paragraphWords[j]))
+						add(bodyWords, paragraphWords[j]);
 	}
 }
 
