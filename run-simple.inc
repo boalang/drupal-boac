@@ -192,7 +192,7 @@ function boa_query_form_submit($form, &$form_state) {
 	$source = "o: output collection of string;\n\n";
 	$source .= "filtered := !def(input.metadata) || !def(input.metadata.doi_url);\n\n";
 	$source .= $query;
-	$source .= "if (!filtered) o << input.metadata.doi_url;";
+	$source .= "if (!filtered) o << pretty_print(input);";
 
 	if ((bool)$form_state['values']['debug'] && is_boa_admin()) {
 		print("<pre>");
