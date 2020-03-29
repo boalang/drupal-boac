@@ -119,28 +119,24 @@ p: Paper = input;
 
 o: output bottom(500) of string weight int;
 
-bodyStore: string;
+stopwords: set of string = stop_words();
 arrBody: array of string;
 storeKeywords: map[int] of string;
-stopwords: set of string = stop_words();
 l: int = 0;
 
 foreach (i: int; def(p.body_text[i])) {
 	foreach (m: int; def(p.body_text[i].body[m])) {
-		bodyStore = p.body_text[i].body[m].text;
-		arrBody = splitall(bodyStore, " ");
+		arrBody = splitall(lowercase(p.body_text[i].body[m].text), " ");
 
-		foreach (j: int; def(arrBody[j])) {
-			if (!contains(stopwords, lowercase(string(arrBody[j])))) {
-				if (len(arrBody[j]) > 3) {
-					if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", lowercase(string(arrBody[j])))) {
-						if (match("(.*vir)$", lowercase(string(arrBody[j])))) {
-							storeKeywords[l] = string(arrBody[j]);
-							l = l + 1;
-						}
-					}
-				}
-			}
+		foreach (j: int; !contains(stopwords, arrBody[j])) {
+            if (len(arrBody[j]) > 3) {
+                if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", arrBody[j])) {
+                    if (match("(.*vir)$", arrBody[j])) {
+                        storeKeywords[l] = arrBody[j];
+                        l = l + 1;
+                    }
+                }
+            }
 		}
 	}
 }
@@ -157,25 +153,24 @@ $examples['q5'] = <<<BOA
 # What do we know about COVID-19 risk factors?
 p: Paper = input;
 
-smoke: output collection of string;
-pregnant: output collection of string;
-neonatal: output collection of string;
-pulmonary: output collection of string;
-
-absStore: string;
+smoke:     output set of string;
+pregnant:  output set of string;
+neonatal:  output set of string;
+pulmonary: output set of string;
 
 foreach (i: int; def(p.abstract[i])) {
-	absStore = p.abstract[i].text;
-	if (((strfind("smoke", lowercase(absStore)) >= 0)||(strfind("smoking", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
+	absStore: string = lowercase(p.abstract[i].text);
+
+	if ((strfind("smoke", absStore) >= 0 || strfind("smoking", absStore) >= 0) && strfind("risk", absStore) >= 0) {
 		smoke << p.metadata.title;
 	}
-	if (((strfind("pregnant", lowercase(absStore)) >= 0)||(strfind("pregnancy", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
+	if ((strfind("pregnant", absStore) >= 0 || strfind("pregnancy", absStore) >= 0) && strfind("risk", absStore) >= 0) {
 		pregnant << p.metadata.title;
 	}
-	if (((strfind("neonatal", lowercase(absStore)) >= 0)||(strfind("neo-natal", lowercase(absStore)) >= 0)) && (strfind("risk", lowercase(absStore)) >= 0)) {
+	if ((strfind("neonatal", absStore) >= 0 || strfind("neo-natal", absStore) >= 0) && strfind("risk", absStore) >= 0) {
 		neonatal << p.metadata.title;
 	}
-	if ((strfind("pulmonary", lowercase(absStore)) >= 0) && (strfind("risk", lowercase(absStore)) >= 0)) {
+	if (strfind("pulmonary", absStore) >= 0 && strfind("risk", absStore) >= 0) {
 		pulmonary << p.metadata.title;
 	}
 }
@@ -189,37 +184,36 @@ $examples['q6'] = <<<BOA
 # What has been published about medical care?
 p: Paper = input;
 
-nursing: output collection of string;
-ards: output collection of string;
-ecmo: output collection of string;
-ventilation: output collection of string;
-n95: output collection of string;
-regulatory: output collection of string;
-medication: output collection of string;
-
-absStore: string;
+nursing:     output set of string;
+ards:        output set of string;
+ecmo:        output set of string;
+ventilation: output set of string;
+n95:         output set of string;
+regulatory:  output set of string;
+medication:  output set of string;
 
 foreach (i: int; def(p.abstract[i])) {
-	absStore = p.abstract[i].text;
-	if ((strfind("nursing", lowercase(absStore)) >= 0)||(strfind("long term care", lowercase(absStore)) >= 0)) {
+	absStore: string = lowercase(p.abstract[i].text);
+
+	if (strfind("nursing", absStore) >= 0 || strfind("long term care", absStore) >= 0) {
 		nursing << p.metadata.title;
 	}
-	if ((strfind("ards", lowercase(absStore)) >= 0)||(strfind("acute respiratory distress syndrome", lowercase(absStore)) >= 0)) {
+	if (strfind("ards", absStore) >= 0 || strfind("acute respiratory distress syndrome", absStore) >= 0) {
 		ards << p.metadata.title;
 	}
-	if ((strfind("ecmo", lowercase(absStore)) >= 0)||(strfind("extracorporeal membrane oxygenation", lowercase(absStore)) >= 0)) {
+	if (strfind("ecmo", absStore) >= 0 || strfind("extracorporeal membrane oxygenation", absStore >= 0) {
 		ecmo << p.metadata.title;
 	}
-	if ((strfind("ventilation", lowercase(absStore)) >= 0)) {
+	if (strfind("ventilation", absStore) >= 0) {
 		ventilation << p.metadata.title;
 	}
-	if ((strfind("n95", lowercase(absStore)) >= 0)) {
+	if (strfind("n95", absStore) >= 0) {
 		n95 << p.metadata.title;
 	}
-	if ((strfind("eua", lowercase(absStore)) >= 0)||(strfind("clia", lowercase(absStore)) >= 0)) {
+	if (strfind("eua", absStore) >= 0 || strfind("clia", absStore) >= 0) {
 		regulatory << p.metadata.title;
 	}
-	if ((strfind("medication", lowercase(absStore)) >= 0) && (strfind("oral", lowercase(absStore)) >= 0)) {
+	if (strfind("medication", absStore) >= 0 && strfind("oral", absStore) >= 0) {
 		medication << p.metadata.title;
 	}
 }
