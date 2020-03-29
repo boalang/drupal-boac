@@ -51,10 +51,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q2'] = t('What are the 100 most used words in the body of the papers?');
-$example_jobs['q2'] = 54;
+$example_names['q2'] = t('What 100 words appear in the most number of paper bodies?');
+$example_jobs['q2'] = 150;
 $examples['q2'] = <<<BOA
-# What are the 100 most used words in the body of the papers?
+# What 100 words appear in the most number of paper bodies?
 p: Paper = input;
 
 o: output top(100) of string weight int;
