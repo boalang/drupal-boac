@@ -24,10 +24,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q1'] = t('The 100 most used words in the abstract of the papers');
+$example_names['q1'] = t('What are the 100 most used words in the abstract of the papers?');
 $example_jobs['q1'] = 55;
 $examples['q1'] = <<<BOA
-#The 100 most used words in the abstract in the papers
+#What are the 100 most used words in the abstract of the papers?
 p: Paper = input;
 abstactStore: string;
 arrAbstract:array of string;
@@ -49,10 +49,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q2'] = t('The 100 most used words in the body of the papers ');
+$example_names['q2'] = t('What are the 100 most used words in the body of the papers?');
 $example_jobs['q2'] = 54;
 $examples['q2'] = <<<BOA
-#The 100 most used words in the body of the papers
+#What are the 100 most used words in the body of the papers?
 p: Paper = input;
 bodyStore: string;
 arrBody:array of string;
@@ -75,10 +75,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q3'] = t('The 500 most uncommon words in the papers related to vaccines');
+$example_names['q3'] = t('What are the 500 most uncommon words in the papers related to vaccines?');
 $example_jobs['q3'] = 96;
 $examples['q3'] = <<<BOA
-#The 500 most uncommon words in the papers related to vaccines 
+#What are the 500 most uncommon words in the papers related to vaccines?
 p: Paper = input;
 bodyStore: string;
 arrBody:array of string;
@@ -87,10 +87,8 @@ stopwords:set of string;
 l:int=0;
 o: output bottom(500) of string weight int;
 stopwords=stop_words();
-if(strfind("vaccine",p.metadata.title)>=0)
-{
-    foreach (i: int; def(p.body_text[i]))
-    {
+if(strfind("vaccine",p.metadata.title)>=0) {
+    foreach (i: int; def(p.body_text[i])) {
             foreach (m: int; def(p.body_text[i].body[m]))
             	bodyStore = p.body_text[i].body[m].text;
             	arrBody = splitall(bodyStore," ");
@@ -110,10 +108,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q4'] = t('The most used antivirals ');
+$example_names['q4'] = t('What are the most used antivirals?');
 $example_jobs['q4'] = 97;
 $examples['q4'] = <<<BOA
-#The most used antivirals
+#What are the most used antivirals?
 p: Paper = input;
 bodyStore: string;
 arrBody:array of string;
@@ -123,17 +121,14 @@ l:int=0;
 o: output bottom(500) of string weight int;
 stopwords=stop_words();
 foreach (i: int; def(p.body_text[i]))
-        foreach (m: int; def(p.body_text[i].body[m]))
-        {
+        foreach (m: int; def(p.body_text[i].body[m])) {
         	bodyStore = p.body_text[i].body[m].text;
         	arrBody = splitall(bodyStore," ");
             foreach (j: int; def(arrBody[j]))
                         	    if(!contains(stopwords,lowercase(string(arrBody[j]))))
                         	        if(len(arrBody[j])>3)
-                                	   if(!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$",lowercase(string(arrBody[j]))))
-                                	   {
-                                	       if(match("(.*vir)$",lowercase(string(arrBody[j]))))
-                                	       {
+                                	   if(!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$",lowercase(string(arrBody[j])))) {
+                                	       if(match("(.*vir)$",lowercase(string(arrBody[j])))) {
                                 	            storeKeywords[l]=string(arrBody[j]);
                                 	            l=l+1;
                                 	       }
@@ -155,27 +150,21 @@ smoke: output collection of string;
 pregnant: output collection of string;
 neonatal: output collection of string;
 pulmonary: output collection of string;
-foreach (i: int; def(p.abstract[i]))
-    {
+foreach (i: int; def(p.abstract[i])) {
        absStore = p.abstract[i].text;
-       if(((strfind("smoke",lowercase(absStore))>=0)||(strfind("smoking",lowercase(absStore))>=0)) && (strfind("risk",lowercase(absStore))>=0))
-       {
+       if(((strfind("smoke",lowercase(absStore))>=0)||(strfind("smoking",lowercase(absStore))>=0)) && (strfind("risk",lowercase(absStore))>=0)) {
             smoke << p.metadata.title;
        }
-       if(((strfind("pregnant",lowercase(absStore))>=0)||(strfind("pregnancy",lowercase(absStore))>=0)) && (strfind("risk",lowercase(absStore))>=0))
-       {
+       if(((strfind("pregnant",lowercase(absStore))>=0)||(strfind("pregnancy",lowercase(absStore))>=0)) && (strfind("risk",lowercase(absStore))>=0)) {
             pregnant << p.metadata.title;
        }
-       if(((strfind("neonatal",lowercase(absStore))>=0)||(strfind("neo-natal",lowercase(absStore))>=0)) && (strfind("risk",lowercase(absStore))>=0))
-       {
+       if(((strfind("neonatal",lowercase(absStore))>=0)||(strfind("neo-natal",lowercase(absStore))>=0)) && (strfind("risk",lowercase(absStore))>=0)) {
             neonatal << p.metadata.title;
        }
-       if((strfind("pulmonary",lowercase(absStore))>=0) && (strfind("risk",lowercase(absStore))>=0))
-       {
+       if((strfind("pulmonary",lowercase(absStore))>=0) && (strfind("risk",lowercase(absStore))>=0)) {
             pulmonary << p.metadata.title;
        }
                                     	   
-            
     }
 BOA;
 
@@ -194,35 +183,27 @@ ventilation: output collection of string;
 n95: output collection of string;
 regulatory: output collection of string;
 medication: output collection of string;
-foreach (i: int; def(p.abstract[i]))
-    {
+foreach (i: int; def(p.abstract[i])) {
        absStore = p.abstract[i].text;
-       if((strfind("nursing",lowercase(absStore))>=0)||(strfind("long term care",lowercase(absStore))>=0))
-       {
+       if((strfind("nursing",lowercase(absStore))>=0)||(strfind("long term care",lowercase(absStore))>=0)) {
             nursing << p.metadata.title;
        }
-       if((strfind("ards",lowercase(absStore))>=0)||(strfind("acute respiratory distress syndrome",lowercase(absStore))>=0))
-       {
+       if((strfind("ards",lowercase(absStore))>=0)||(strfind("acute respiratory distress syndrome",lowercase(absStore))>=0)) {
             ards << p.metadata.title;
        }
-       if((strfind("ecmo",lowercase(absStore))>=0)||(strfind("extracorporeal membrane oxygenation",lowercase(absStore))>=0))
-       {
+       if((strfind("ecmo",lowercase(absStore))>=0)||(strfind("extracorporeal membrane oxygenation",lowercase(absStore))>=0)) {
             ecmo << p.metadata.title;
        }
-       if((strfind("ventilation",lowercase(absStore))>=0))
-       {
+       if((strfind("ventilation",lowercase(absStore))>=0)) {
             ventilation << p.metadata.title;
        }
-       if((strfind("n95",lowercase(absStore))>=0))
-       {
+       if((strfind("n95",lowercase(absStore))>=0)) {
             n95 << p.metadata.title;
        }
-       if((strfind("eua",lowercase(absStore))>=0)||(strfind("clia",lowercase(absStore))>=0))
-       {
+       if((strfind("eua",lowercase(absStore))>=0)||(strfind("clia",lowercase(absStore))>=0)) {
             regulatory << p.metadata.title;
        }
-       if((strfind("medication",lowercase(absStore))>=0) && (strfind("oral",lowercase(absStore))>=0))
-       {
+       if((strfind("medication",lowercase(absStore))>=0) && (strfind("oral",lowercase(absStore))>=0)) {
             medication << p.metadata.title;
        }
                                     	   
