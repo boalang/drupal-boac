@@ -118,15 +118,17 @@ jQuery(document).ajaxComplete(function(){
 JAVASCRIPT
 	);
 
-	$form['input'] = array(
-		'#type' => 'select',
-		'#title' => t('Input Dataset'),
-		'#default_value' => isset($form['input']['#default_value']) ? $form['input']['#default_value'] : 0
-	);
+	if (is_boa_admin()) {
+		$form['input'] = array(
+			'#type' => 'select',
+			'#title' => t('Input Dataset'),
+			'#default_value' => isset($form['input']['#default_value']) ? $form['input']['#default_value'] : 0
+		);
 
-	$result = _get_datasets();
-	foreach ($result as $record)
-		$form['input']['#options'][$record->id] = $record->name;
+		$result = _get_datasets();
+		foreach ($result as $record)
+			$form['input']['#options'][$record->id] = $record->name;
+	}
 
 	$form['run'] = array(
 		'#type' => 'submit',
@@ -151,7 +153,10 @@ function boa_run_form_callback($form, $form_state) {
 function boa_run_form_submit($form, &$form_state) {
 	global $user;
 
-	if (!is_valid_input($form_state['values']['input']))
+	$input = $form_state['values']['input'];
+	if (!is_boa_admin())
+		$input = 2;
+	if (!is_valid_input($input))
 		invalid_input();
 
 	$source = trim($form_state['values']['source']);
@@ -171,7 +176,7 @@ function boa_run_form_submit($form, &$form_state) {
 		'uid' => $user->uid,
 		'parent_id' => isset($form_state['values']['parent']) ? (int)$form_state['values']['parent'] : NULL,
 		'source' => $source,
-		'input' => $form_state['values']['input'],
+		'input' => $input,
 	));
 	date_default_timezone_set($tz);
 	$id = $query->execute();
