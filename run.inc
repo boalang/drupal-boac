@@ -58,7 +58,8 @@ function boa_run_form($form, &$form_state) {
 			$result = $query->execute();
 			$record = $result->fetchObject();
 			$form['source']['#default_value'] = $record->source;
-			$form['input']['#default_value'] = $record->input;
+			if (is_boa_admin())
+				$form['input']['#default_value'] = $record->input;
 			$form['parent']['#default_value'] = $_GET['edit'];
 		}
 	}
@@ -153,9 +154,10 @@ function boa_run_form_callback($form, $form_state) {
 function boa_run_form_submit($form, &$form_state) {
 	global $user;
 
-	$input = $form_state['values']['input'];
 	if (!is_boa_admin())
 		$input = 2;
+	else
+		$input = $form_state['values']['input'];
 	if (!is_valid_input($input))
 		invalid_input();
 
