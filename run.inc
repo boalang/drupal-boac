@@ -1,5 +1,7 @@
 <?php
 
+module_load_include('inc', 'boa', 'examples');
+
 function _get_datasets() {
 	$query = get_input_query();
 	$query->addExpression('IF(enabled = 1, name, CONCAT(\'[admin] \', name))', 'name');
@@ -8,12 +10,28 @@ function _get_datasets() {
 }
 
 function boa_run_form($form, &$form_state) {
+	global $examples, $example_options;
 	global $base_path;
 
 	drupal_add_js($base_path . 'sites/all/libraries/ace/src/ace.js');
 	drupal_add_js($base_path . 'sites/all/libraries/ace/src/ext-language_tools.js');
 	drupal_add_js($base_path . 'sites/all/libraries/ace/src/theme-crimson_editor.js');
 	drupal_add_js($base_path . 'sites/all/libraries/ace/src/mode-boa.js');
+
+	$form['examples'] = array(
+		'#type' => 'select',
+		'#title' => t('Run an Example'),
+		'#ajax' => array(
+			'callback' => 'boa_run_form_callback',
+			'wrapper' => 'sourcecode',
+			'progress' => array(
+				'type' => 'throbber'
+			),
+			'effect' => 'fade',
+		),
+		'#options' => $example_options,
+		'#default_value' => 0,
+	);
 
 	$form['source'] = array(
 		'#type' => 'textarea',
@@ -26,6 +44,8 @@ function boa_run_form($form, &$form_state) {
 		'#type' => 'hidden',
 	);
 
+	if (isset($_GET['example']))
+		$form['examples']['#default_value'] = $_GET['example'];
 	if (isset($_GET['edit'])) {
 		if (!boa_public_access($_GET['edit']) && !isValidJob($_GET['edit'])) {
 			invalidJob($_GET['edit']);
@@ -45,7 +65,7 @@ function boa_run_form($form, &$form_state) {
 	if (isset($_GET['source']))
 		$form['source']['#default_value'] = $_GET['source'];
 
-	$source = !empty($form['source']['#default_value']) ? $form['source']['#default_value'] : "";
+	$source = !empty($form_state['values']['examples']) ? $examples[$form_state['values']['examples']] : (!empty($form['source']['#default_value']) ? $form['source']['#default_value'] : "");
 	$form['source']['#suffix'] = '<div style="position: relative; width: 100%;" id="source"></div></div>';
 
 	$form['#attributes']['onsubmit'] = "jQuery('textarea[name=\"source\"]').val(jQuery('source').getSession().getValue());";
@@ -118,6 +138,14 @@ JAVASCRIPT
 	);
 
 	return $form;
+}
+
+function boa_run_form_callback($form, $form_state) {
+	global $examples;
+	$form['source']['#value'] = '';
+	if (!empty($form_state['values']['examples']))
+		$form['source']['#value'] = htmlspecialchars_decode($examples[$form_state['values']['examples']]);
+	return $form['source'];
 }
 
 function boa_run_form_submit($form, &$form_state) {
