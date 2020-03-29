@@ -214,7 +214,8 @@ function _run_rpc($source, $input) {
 	$query = db_insert('boa_output');
 	$query->fields(array(
 		'id' => $id,
-		'length' => 0
+		'length' => 0,
+		'web_result' => '',
 	));
 	$query->execute();
 
