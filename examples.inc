@@ -112,12 +112,12 @@ BOA;
 # ------------------------------------------------------------------------------------ #
 
 $example_names['q4'] = t('What are the most mentioned antivirals?');
-$example_jobs['q4'] = 97;
+$example_jobs['q4'] = 172;
 $examples['q4'] = <<<BOA
 # What are the most mentioned antivirals?
 p: Paper = input;
 
-o: output bottom(500) of string weight int;
+o: output top(500) of string weight int;
 
 stopwords: set of string = stop_words();
 # store all words used in this paper's body
@@ -141,10 +141,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q5'] = t('What do we know about COVID-19 risk factors?');
-$example_jobs['q5'] = 112;
+$example_names['q5'] = t('What do we know about cornavirus risk factors?');
+$example_jobs['q5'] = 173;
 $examples['q5'] = <<<BOA
-# What do we know about COVID-19 risk factors?
+# What do we know about cornavirus risk factors?
 p: Paper = input;
 
 smoke:     output set of string;
@@ -173,7 +173,7 @@ BOA;
 # ------------------------------------------------------------------------------------ #
 
 $example_names['q6'] = t('What has been published about medical care?');
-$example_jobs['q6'] = 113;
+$example_jobs['q6'] = 175;
 $examples['q6'] = <<<BOA
 # What has been published about medical care?
 p: Paper = input;
@@ -195,7 +195,7 @@ foreach (i: int; def(p.abstract[i])) {
 	if (strfind("ards", absStore) >= 0 || strfind("acute respiratory distress syndrome", absStore) >= 0) {
 		ards << p.metadata.title;
 	}
-	if (strfind("ecmo", absStore) >= 0 || strfind("extracorporeal membrane oxygenation", absStore >= 0) {
+	if (strfind("ecmo", absStore) >= 0 || strfind("extracorporeal membrane oxygenation", absStore) >= 0) {
 		ecmo << p.metadata.title;
 	}
 	if (strfind("ventilation", absStore) >= 0) {
