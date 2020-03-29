@@ -120,29 +120,24 @@ p: Paper = input;
 o: output bottom(500) of string weight int;
 
 stopwords: set of string = stop_words();
-arrBody: array of string;
-storeKeywords: map[int] of string;
-l: int = 0;
+# store all words used in this paper's body
+bodyWords: set of string;
 
 foreach (i: int; def(p.body_text[i])) {
 	foreach (m: int; def(p.body_text[i].body[m])) {
-		arrBody = splitall(lowercase(p.body_text[i].body[m].text), " ");
+		paragraphWords: array of string = splitall(lowercase(p.body_text[i].body[m].text), " ");
 
-		foreach (j: int; !contains(stopwords, arrBody[j])) {
-            if (len(arrBody[j]) > 3) {
-                if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", arrBody[j])) {
-                    if (match("(.*vir)$", arrBody[j])) {
-                        storeKeywords[l] = arrBody[j];
-                        l = l + 1;
-                    }
-                }
-            }
-		}
+		foreach (j: int; !contains(stopwords, paragraphWords[j]))
+            if (len(paragraphWords[j]) > 3)
+                if (!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$", paragraphWords[j]))
+                    if (match("(.*vir)$", paragraphWords[j]))
+                        add(bodyWords, paragraphWords[j]);
 	}
 }
 
-foreach (k: int; def(storeKeywords[k]))
-	o << storeKeywords[k] weight 1;
+words := values(bodyWords);
+foreach (k: int; def(words[k]))
+	o << words[k] weight 1;
 BOA;
 
 # ------------------------------------------------------------------------------------ #
