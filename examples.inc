@@ -114,7 +114,7 @@ foreach (i: int; def(p.body_text[i]))
             foreach (j: int; def(arrBody[j]))
                         	    if(!contains(stopwords,lowercase(string(arrBody[j]))))
                         	        if(len(arrBody[j])>3)
-                                	   if(!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$",lowercase(string(arrBody[j]))))
+                                	   if(!match("^[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\\n]+$",lowercase(string(arrBody[j]))))
                                 	   {
                                 	       if(match("(.*vir)$",lowercase(string(arrBody[j]))))
                                 	       {
