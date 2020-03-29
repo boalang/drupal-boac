@@ -80,7 +80,7 @@ BOA;
 # ------------------------------------------------------------------------------------ #
 
 $example_names['q3'] = t('What 500 words appear in the least number of paper bodies for papers with vaccine in the title?');
-$example_jobs['q3'] = 96;
+$example_jobs['q3'] = 168;
 $examples['q3'] = <<<BOA
 # What 500 words appear in the least number of paper bodies for papers with vaccine in the title?
 p: Paper = input;
@@ -97,10 +97,9 @@ if (strfind("vaccine", lowercase(p.metadata.title)) >= 0) {
 			paragraphWords: array of string = splitall(lowercase(p.body_text[i].body[m].text), " ");
 
 			foreach (j: int; !contains(stopwords, paragraphWords[j]))
-				if (len(paragraphWords[j]) > 5)
-					if (!match("[()0-9$@$!%*?&#^'\\"*=~><:;/,\\\\-_. +\\n]+$", paragraphWords[j]))
-						if (match(`.*:*$`, paragraphWords[j]))
-							add(bodyWords, paragraphWords[j]);
+				# match only english words
+				if (match("^[a-z]+$", paragraphWords[j]))
+					add(bodyWords, paragraphWords[j]);
 		}
 	}
 
