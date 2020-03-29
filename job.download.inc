@@ -33,25 +33,25 @@ function _job_output_rpc($jobId) {
 		return t('The job has no output.');
 
 	$dstdir = $jobId . '/' . $record->hash;
-	$filename = "boa-job$jobId-output.txt";
+	$filename = "boac-job$jobId-output.txt";
 
-	$dir = '/home/boa/www/boa/output/' . $dstdir;
+	$dir = '/home/boa/www/boac/output/' . $dstdir;
 	$path = $dir . '/' . $filename;
 
 	if (!file_exists($path) || $record->length != filesize($path)) {
-		$tmp = tempnam("/tmp", "boa-output");
+		$tmp = tempnam("/tmp", "boac-output");
 		@unlink($tmp);
 		drupal_register_shutdown_function('download_tmp_cleanup', $tmp);
 
 		set_time_limit(0);
-		system("/home/hadoop/hadoop-current/bin/hadoop fs -getmerge /boa/$jobId/ $tmp");
+		system("/home/hadoop/hadoop-current/bin/hadoop fs -getmerge /boac/$jobId/ $tmp");
 
 		@mkdir($dir, 0700, true);
 		rename($tmp, $path);
 		@unlink($tmp);
 	}
 
-	return "http://boa.cs.iastate.edu/boa/output/$dstdir/$filename";
+	return "http://boa.cs.iastate.edu/boac/output/$dstdir/$filename";
 }
 
 function boa_job_download($jobId) {
@@ -77,17 +77,17 @@ function _download_job($jobId, $fallbackUrl) {
 
 	if ($record->hadoop_status == 2) {
 		if ($record->length > 0) {
-			$tmp = tempnam("/tmp", "boa-output");
+			$tmp = tempnam("/tmp", "boac-output");
 			@unlink($tmp);
 			drupal_register_shutdown_function('download_tmp_cleanup', $tmp);
 
 			set_time_limit(0);
-			system("/home/hadoop/hadoop-current/bin/hadoop fs -getmerge /boa/$jobId/ $tmp");
+			system("/home/hadoop/hadoop-current/bin/hadoop fs -getmerge /boac/$jobId/ $tmp");
 			$file = fopen($tmp, 'r');
 
 			drupal_add_http_header('Content-Type', 'text; utf-8');
 			drupal_add_http_header('Content-Length', $record->length);
-			drupal_add_http_header('Content-Disposition', "attachment; filename=\"boa-job$jobId-output.txt\"");
+			drupal_add_http_header('Content-Disposition', "attachment; filename=\"boac-job$jobId-output.txt\"");
 
 			while (!feof($file)) {
 				print fread($file, 65536);

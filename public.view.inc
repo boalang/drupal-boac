@@ -97,7 +97,7 @@ CSS;
 			$content .= '</ul></div>';
 
 			$content .= '<pre class="output" style="margin-top: 0;">';
-			$content .= htmlspecialchars($record->web_result);
+			$content .= linkify(htmlspecialchars($record->web_result), array('target' => '_blank'));
 			$content .= '</pre>';
 			if ($trimmed)
 				$content .= '... remaining output not shown, please <a href="?q=boa/job/public/' . $record->id . '/download">download output</a>.';

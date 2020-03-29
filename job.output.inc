@@ -80,7 +80,7 @@ function _print_table($table) {
 	}
 	if ($prevTable)
 		$content .= "</table></pre>\n";
-	return $content;
+	return linkify($content, array('target' => '_blank'));
 }
 
 function _print_row($row) {
