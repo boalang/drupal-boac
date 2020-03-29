@@ -179,7 +179,8 @@ function boa_run_form_submit($form, &$form_state) {
 	$query = db_insert('boa_output');
 	$query->fields(array(
 		'id' => $id,
-		'length' => 0
+		'length' => 0,
+		'web_result' => '',
 	));
 	$query->execute();
 
