@@ -11,8 +11,6 @@ function _job_rpc($id) {
 	$result = $query->execute();
 
 	while ($data = $result->fetchObject()) {
-		fakeRunning($data);
-
 		return array(
 			'id' => $data->id,
 			'submitted' => $data->submitted . ' ' . strftime('%Z'),
@@ -73,8 +71,6 @@ function _jobs_range_rpc($public, $offset, $limit) {
 
 	$rows = array();
 	while ($data = $result->fetchObject()) {
-		fakeRunning($data);
-
 		$rows[] = array(
 			'id' => $data->id,
 			'submitted' => $data->submitted . ' ' . strftime('%Z'),
@@ -152,8 +148,6 @@ function boa_jobs() {
 	$rows = array();
 	while ($data = $result->fetchObject()) {
 		$actionList = array();
-
-		fakeRunning($data);
 
 		if ($data->compiler_status == 0 || $data->compiler_status == 1 || $data->hadoop_status == 1 ||
 			($data->compiler_status == 1 && $data->hadoop_status == 0))

@@ -95,8 +95,6 @@ function boa_search_results($keyword) {
 	while ($data = $result->fetchObject()) {
 		$actions = array();
 
-		fakeRunning($data);
-
 		if ($data->compiler_status == 0 || $data->compiler_status == 1 || $data->hadoop_status == 1 ||
 		    ($data->compiler_status == 1 && $data->hadoop_status == 0))
 			$actions['stop'] = t('stop');

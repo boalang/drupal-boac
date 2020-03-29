@@ -229,8 +229,6 @@ function _run_rpc($source, $input) {
 
 	$rows = array();
 	while ($data = $result->fetchObject()) {
-		fakeRunning($data);
-
 		$rows[] = array(
 			'id' => $id,
 			'submitted' => $data->submitted . ' ' . strftime('%Z'),

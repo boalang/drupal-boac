@@ -71,18 +71,6 @@ function formatBytes($size) {
 	return round(pow(1024, $base - floor($base)), 2) . $suffixes[floor($base)];
 }
 
-function fakeRunning($record) {
-	if (is_boa_admin())
-		return;
-
-	if ($record->compiler_status == 2 && $record->compile_end > time()) {
-		$record->compiler_status = 1;
-		$record->hadoop_status = 0;
-	}
-	if ($record->hadoop_status == 2 && $record->hadoop_end > time())
-		$record->hadoop_status = 1;
-}
-
 function boa_duration($length) {
 	$s = "";
 	if ($length > 3600) {
@@ -172,7 +160,6 @@ function boa_output_access_rpc($jobId) {
 		return false;
 
 	$record = $result->fetchObject();
-	fakeRunning($record);
 
 	return $record->hadoop_status == 2;
 }
@@ -191,7 +178,6 @@ function boa_output_access($jobId) {
 		return false;
 
 	$record = $result->fetchObject();
-	fakeRunning($record);
 
 	return $record->hadoop_status == 2 && $record->length > 0;
 }
@@ -239,7 +225,6 @@ function boa_job_running_access($jobId) {
 		return false;
 
 	$record = $result->fetchObject();
-	fakeRunning($record);
 
 	return $record->compiler_status == 0 || $record->compiler_status == 1 ||
 			($record->compiler_status == 2 && ($record->hadoop_status == 0 || $record->hadoop_status == 1));

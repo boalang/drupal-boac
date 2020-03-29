@@ -45,8 +45,6 @@ function boa_job($jobId) {
 	if ($record->parent_id > 0)
 		$content .= '<br/>';
 
-	fakeRunning($record);
-
 	if ($record->compiler_status == 0 || $record->compiler_status == 1 ||
 			($record->compiler_status == 2 && ($record->hadoop_status == 0 || $record->hadoop_status == 1)))
 		$content .= '<b>Job is currently running</b> <div class="ajax-progress ajax-progress-throbber"><div class="throbber">&nbsp;</div></div><br/>(note: this page automatically reloads)<br/><br/>';
@@ -219,10 +217,6 @@ function generate_content($jobId) {
 
 	# -----------------------------------------------
 
-	$faked = $record->hadoop_status;
-	fakeRunning($record);
-	$faked = $faked != $record->hadoop_status;
-
 	$content = '<h2>Compilation <a href="#">^</a></h2>';
 	$content .= '<b>Status:</b> ' . showStatus($record->compiler_status);
 	if ($record->compiler_status == 0 || $record->compiler_status == 1)
@@ -258,8 +252,7 @@ function generate_content($jobId) {
 		$content .= '<b>Status:</b> ' . showStatus($record->hadoop_status);
 		if ($record->hadoop_status == 0 || $record->hadoop_status == 1) {
 			$content .= '<div class="ajax-progress ajax-progress-throbber"><div class="throbber">&nbsp;</div></div>';
-			if (!$faked)
-				$content .= '[<a href="?q=boa/job/' . $jobId . '/status">' . t('status') . '</a>]';
+            $content .= '[<a href="?q=boa/job/' . $jobId . '/status">' . t('status') . '</a>]';
 		}
 		$content .= '<br/>';
 		if ($record->hadoop_status == 1)

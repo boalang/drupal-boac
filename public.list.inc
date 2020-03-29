@@ -52,8 +52,6 @@ function boa_job_list() {
 
 	$rows = array();
 	while ($data = $result->fetchObject()) {
-		fakeRunning($data);
-
 		$rows[] = array(
 			$data->username,
 			'<a title="' . htmlspecialchars(trim($data->source)) . '" href="?q=boa/job/public/' . $data->id . '">' . $data->id . '</a>',

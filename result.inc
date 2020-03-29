@@ -37,8 +37,6 @@ function boa_result($jobId) {
 </style>
 CSS;
 
-	fakeRunning($record);
-
 	if ($record->compiler_status == 0 || $record->compiler_status == 1 ||
 			($record->compiler_status == 2 && ($record->hadoop_status == 0 || $record->hadoop_status == 1)))
 		$content .= '<b>Query is currently running</b> <div class="ajax-progress ajax-progress-throbber"><div class="throbber">&nbsp;</div></div><br/>(note: this page automatically reloads)<br/><br/>';
