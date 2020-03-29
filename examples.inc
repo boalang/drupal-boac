@@ -9,7 +9,7 @@ if (!function_exists('t')) {
 # ------------------------------------------------------------------------------------ #
 
 $example_names['q0'] = t('How many papers have empty vs. non-empty title?');
-$example_jobs['q0'] = 121;
+$example_jobs['q0'] = 145;
 $examples['q0'] = <<<BOA
 p: Paper = input;
 
