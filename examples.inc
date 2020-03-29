@@ -87,35 +87,26 @@ p: Paper = input;
 
 o: output bottom(500) of string weight int;
 
-bodyStore: string;
-arrBody: array of string;
-storeKeywords: map[int] of string;
 stopwords: set of string = stop_words();
-l: int = 0;
+# store all words used in this paper's body
+bodyWords: set of string;
 
-if (strfind("vaccine", p.metadata.title) >= 0) {
+if (strfind("vaccine", lowercase(p.metadata.title)) >= 0) {
 	foreach (i: int; def(p.body_text[i])) {
 		foreach (m: int; def(p.body_text[i].body[m])) {
-			bodyStore = p.body_text[i].body[m].text;
-			arrBody = splitall(bodyStore, " ");
+			paragraphWords: array of string = splitall(lowercase(p.body_text[i].body[m].text), " ");
 
-			foreach (j: int; def(arrBody[j])) {
-				if (!contains(stopwords, lowercase(string(arrBody[j])))) {
-					if (len(arrBody[j]) > 5) {
-						if ((!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", lowercase(string(arrBody[j])))) && (match("(.*:*)$", lowercase(string(arrBody[j])))))
-						{
-							storeKeywords[l] = string(arrBody[j]);
-							l = l + 1;
-						}
-					}
-				}
-			}
+			foreach (j: int; !contains(stopwords, paragraphWords[j]))
+				if (len(paragraphWords[j]) > 5)
+					if (!match("[()0-9$@$!%*?&#^'\"*=~><:;/,\\-_. +\n]+$", paragraphWords[j]) && match(`(.*:*)$`, paragraphWords[j]))
+						add(bodyWords, paragraphWords[j]);
 		}
 	}
-}
 
-foreach (k: int; def(storeKeywords[k]))
-	o << storeKeywords[k] weight 1;
+	words := values(bodyWords);
+	foreach (k: int; def(words[k]))
+		o << words[k] weight 1;
+}
 BOA;
 
 # ------------------------------------------------------------------------------------ #
