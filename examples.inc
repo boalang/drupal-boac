@@ -8,6 +8,22 @@ if (!function_exists('t')) {
 
 # ------------------------------------------------------------------------------------ #
 
+$example_names['q0'] = t('How many papers have empty vs. non-empty title?');
+$example_jobs['q0'] = 121;
+$examples['q0'] = <<<BOA
+p: Paper = input;
+empty: output sum of int;
+non_empty: output sum of int;
+
+# check if title is empty or not
+if (p.metadata.title == "")
+    empty << 1;
+else
+    non_empty << 1;
+BOA;
+
+# ------------------------------------------------------------------------------------ #
+
 $example_names['q1'] = t('The 100 most used words in the abstract of the papers');
 $example_jobs['q1'] = 55;
 $examples['q1'] = <<<BOA
@@ -220,15 +236,14 @@ BOA;
 # ------------------------------------------------------------------------------------ #
 
 $example_options = array(
-	0 => t('-- Select Example --'),
-	'TODO category' => array(
-		'q1' => $example_names['q1'],
-		'q2' => $example_names['q2'],
-		'q3' => $example_names['q3'],
-		'q4' => $example_names['q4'],
-		'q5' => $example_names['q5'],
-		'q6' => $example_names['q6'],
-	),
+     0 => t('-- Select Example --'),
+     'q0' => $example_names['q0'],
+     'q1' => $example_names['q1'],
+     'q2' => $example_names['q2'],
+     'q3' => $example_names['q3'],
+     'q4' => $example_names['q4'],
+     'q5' => $example_names['q5'],
+     'q6' => $example_names['q6'],
 );
 
 ?>
