@@ -34,7 +34,7 @@ function boa_result($jobId) {
 <style type="text/css" media="all">
 .resultlist {
 }
-</script>
+</style>
 CSS;
 
 	fakeRunning($record);
