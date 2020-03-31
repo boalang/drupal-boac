@@ -192,7 +192,7 @@ function boa_query_form_submit($form, &$form_state) {
 	$source = "o: output collection[int] of string;\n\n";
 	$source .= "filtered := !def(input.metadata) || !def(input.metadata.doi_url) || !def(input.metadata.publish_time);\n\n";
 	$source .= $query;
-	$source .= "if (!filtered) o[format(\"%0.3d\", yearof(now() - yearof(input.metadata.publish_time))] << pretty_print(input);";
+	$source .= "if (!filtered) o[format(\"%0.3d\", yearof(now() - yearof(input.metadata.publish_time)))] << pretty_print(input);";
 
 	if ((bool)$form_state['values']['debug'] && is_boa_admin()) {
 		print("<pre>");
