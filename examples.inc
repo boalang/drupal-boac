@@ -8,11 +8,10 @@ if (!function_exists('t')) {
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q0'] = t('How many papers have empty vs. non-empty title?');
-$example_jobs['q0'] = 145;
-$examples['q0'] = <<<BOA
+$example_names['q1'] = t('How many papers have empty vs. non-empty title?');
+$example_jobs['q1'] = 226;
+$examples['q1'] = <<<BOA
 p: Paper = input;
-
 empty: output sum of int;
 non_empty: output sum of int;
 
@@ -25,12 +24,11 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q1'] = t('What 100 words appear in the most number of paper abstracts?');
-$example_jobs['q1'] = 149;
-$examples['q1'] = <<<BOA
+$example_names['q2'] = t('What 100 words appear in the most number of paper abstracts?');
+$example_jobs['q2'] = 227;
+$examples['q2'] = <<<BOA
 # What 100 words appear in the most number of paper abstracts?
 p: Paper = input;
-
 o: output top(100) of string weight int;
 
 stopwords: set of string = stop_words();
@@ -51,12 +49,11 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q2'] = t('What 100 words appear in the most number of paper bodies?');
-$example_jobs['q2'] = 150;
-$examples['q2'] = <<<BOA
+$example_names['q3'] = t('What 100 words appear in the most number of paper bodies?');
+$example_jobs['q3'] = 228;
+$examples['q3'] = <<<BOA
 # What 100 words appear in the most number of paper bodies?
 p: Paper = input;
-
 o: output top(100) of string weight int;
 
 stopwords: set of string = stop_words();
@@ -79,12 +76,11 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q3'] = t('What 500 words appear in the least number of paper bodies for papers with vaccine in the title?');
-$example_jobs['q3'] = 168;
-$examples['q3'] = <<<BOA
+$example_names['q4'] = t('What 500 words appear in the least number of paper bodies for papers with vaccine in the title?');
+$example_jobs['q4'] = 229;
+$examples['q4'] = <<<BOA
 # What 500 words appear in the least number of paper bodies for papers with vaccine in the title?
 p: Paper = input;
-
 o: output bottom(500) of string weight int;
 
 stopwords: set of string = stop_words();
@@ -111,12 +107,11 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q4'] = t('What are the most mentioned antivirals?');
-$example_jobs['q4'] = 172;
-$examples['q4'] = <<<BOA
+$example_names['q5'] = t('What are the most mentioned antivirals?');
+$example_jobs['q5'] = 230;
+$examples['q5'] = <<<BOA
 # What are the most mentioned antivirals?
 p: Paper = input;
-
 o: output top(500) of string weight int;
 
 stopwords: set of string = stop_words();
@@ -141,10 +136,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q5'] = t('What do we know about cornavirus risk factors?');
-$example_jobs['q5'] = 173;
-$examples['q5'] = <<<BOA
-# What do we know about cornavirus risk factors?
+$example_names['q6'] = t('What do we know about cornavirus risk factors?');
+$example_jobs['q6'] = 231;
+$examples['q6'] = <<<BOA
+## What do we know about cornavirus risk factors?
 p: Paper = input;
 
 smoke:     output set of string;
@@ -172,10 +167,10 @@ BOA;
 
 # ------------------------------------------------------------------------------------ #
 
-$example_names['q6'] = t('What has been published about medical care?');
-$example_jobs['q6'] = 175;
-$examples['q6'] = <<<BOA
-# What has been published about medical care?
+$example_names['q7'] = t('What has been published about medical care?');
+$example_jobs['q7'] = 232;
+$examples['q7'] = <<<BOA
+## What has been published about medical care?
 p: Paper = input;
 
 nursing:     output set of string;
@@ -220,13 +215,13 @@ BOA;
 
 $example_options = array(
 	 0 => t('-- Select Example --'),
-	 'q0' => $example_names['q0'],
 	 'q1' => $example_names['q1'],
 	 'q2' => $example_names['q2'],
 	 'q3' => $example_names['q3'],
 	 'q4' => $example_names['q4'],
 	 'q5' => $example_names['q5'],
 	 'q6' => $example_names['q6'],
+	 'q7' => $example_names['q7'],
 );
 
 ?>
