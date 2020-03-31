@@ -216,7 +216,7 @@ function get_output($jobId) {
 			$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
 			foreach ($rows as $row) {
 				$s = linkify(htmlspecialchars($row), array('target' => '_blank'));
-				$content .= "\t<li>" . substr($s, strpos($s, '[] = ') + 5) . "</li>\n";
+				$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
 			}
 			if ($trimmed)
 				$content .= "... remaining output not shown, please <a href=\"?q=boa/job/$jobId/download\">download output</a>.\n";
