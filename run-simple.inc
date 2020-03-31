@@ -194,7 +194,7 @@ function boa_query_form_submit($form, &$form_state) {
 	$source .= $query;
 	$source .= "if (!filtered) o[format(\"%03d\", yearof(now()) - yearof(input.metadata.publish_time))] << pretty_print(input);";
 
-	if ((bool)$form_state['values']['debug'] && is_boa_admin()) {
+	if (isset($form_state['values']['debug']) && (bool)$form_state['values']['debug'] && is_boa_admin()) {
 		print("<pre>");
 		print($source);
 		print("</pre>");
