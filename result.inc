@@ -214,7 +214,12 @@ function get_output($jobId) {
 			if ($trimmed)
 				$content .= "\nNote: Result is <b>" . formatBytes($record->length) . "</b>, only showing first 64k\n";
 			$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
+            $year = -1;
 			foreach ($rows as $row) {
+                $newyear = date("Y") - (int)substr($row, 2, strpos($row, ']'));
+                if ($year != $newyear)
+                    $content .= "\t<h3>$newyear</h3>\n";
+                $year = $newyear;
 				$s = linkify(htmlspecialchars($row), array('target' => '_blank'));
 				$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
 			}
