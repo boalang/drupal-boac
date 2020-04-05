@@ -153,6 +153,8 @@ function generate_content($jobId) {
 		$loc = 'search_abstract';
 	else if (strpos($record->source, 'search_body') !== false)
 		$loc = 'search_body';
+	else if (strpos($record->source, 'has_finding') !== false)
+		$loc = 'has_finding';
 
 	if (preg_match_all('/if \((?:!filtered && )?!' . $loc . '\("([^"]+)", input\)\)/', $record->source, $matches))
 		foreach ($matches[1] as $word)
@@ -177,6 +179,9 @@ function generate_content($jobId) {
 			break;
 		case 'search_body':
 			$content .= "in the body of the article<br/>\n";
+			break;
+		case 'has_finding':
+			$content .= "in the findings of the article<br/>\n";
 			break;
 	}
 	$content .= "<br/>\n";
