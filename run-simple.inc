@@ -116,66 +116,40 @@ function boa_query_form_submit($form, &$form_state) {
 
 	$query = '';
 
+	$loc = isset($form_state['values']['loc']) ? (int)$form_state['values']['loc'] : -1;
+	switch ($loc) {
+		default:
+			$searchFunc = "";
+			break;
+		case 1:
+			$searchFunc = "search_paper";
+			break;
+		case 2:
+			$searchFunc = "search_title";
+			break;
+		case 3:
+			$searchFunc = "search_abstract";
+			break;
+		case 4:
+			$searchFunc = "search_body";
+			break;
+	}
+
 	if (!empty($form_state['values']['allwords'])) {
 		$query .= "if (!filtered) {\n";
-		$loc = (int)$form_state['values']['loc'];
 		foreach (explode(' ', $form_state['values']['allwords']) as $k)
-			switch ($loc) {
-				default:
-				case 1:
-					$query .= "\tif (!search_paper(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-				case 2:
-					$query .= "\tif (!search_title(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-				case 3:
-					$query .= "\tif (!search_abstract(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-				case 4:
-					$query .= "\tif (!search_body(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-			}
+			$query .= "\tif (!filtered && !$searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
 		$query .= "}\n\n";
 	}
 	if (!empty($form_state['values']['phrase'])) {
 		$query .= "if (!filtered) {\n";
-		$loc = (int)$form_state['values']['loc'];
-		switch ($loc) {
-			default:
-			case 1:
-				$query .= "\tif (!search_paper(\"" . $form_state['values']['phrase'] . "\", input))\n\t\tfiltered = true;\n";
-				break;
-			case 2:
-				$query .= "\tif (!search_title(\"" . $form_state['values']['phrase'] . "\", input))\n\t\tfiltered = true;\n";
-				break;
-			case 3:
-				$query .= "\tif (!search_abstract(\"" . $form_state['values']['phrase'] . "\", input))\n\t\tfiltered = true;\n";
-				break;
-			case 4:
-				$query .= "\tif (!search_body(\"" . $form_state['values']['phrase'] . "\", input))\n\t\tfiltered = true;\n";
-				break;
-		}
+		$query .= "\tif (!filtered && !$searchFunc(\"" . $form_state['values']['phrase'] . "\", input))\n\t\tfiltered = true;\n";
 		$query .= "}\n\n";
 	}
 	if (!empty($form_state['values']['without'])) {
 		$query .= "if (!filtered) {\n";
-		$loc = (int)$form_state['values']['loc'];
 		foreach (explode(' ', $form_state['values']['without']) as $k)
-			switch ($loc) {
-				default:
-				case 1:
-					$query .= "\tif (search_paper(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-				case 2:
-					$query .= "\tif (search_title(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-				case 3:
-					$query .= "\tif (search_abstract(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-				case 4:
-					$query .= "\tif (search_body(\"$k\", input))\n\t\tfiltered = true;\n";
-					break;
-			}
+			$query .= "\tif (!filtered && $searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
 		$query .= "}\n\n";
 	}
 	if (!empty($form_state['values']['start'])) {

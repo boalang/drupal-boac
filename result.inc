@@ -154,13 +154,13 @@ function generate_content($jobId) {
 	else if (strpos($record->source, 'search_body') !== false)
 		$loc = 'search_body';
 
-	if (preg_match_all('/if \(!' . $loc . '\("([^"]+)", input\)\)/', $record->source, $matches))
+	if (preg_match_all('/if \((?:!filtered && )?!' . $loc . '\("([^"]+)", input\)\)/', $record->source, $matches))
 		foreach ($matches[1] as $word)
 			if (strpos($word, ' ') === false)
 				$content .= '<b>Must contain word</b>: ' . "$word<br/>\n";
 			else
 				$content .= '<b>Must contain phrase</b>: ' . "$word<br/>\n";
-	if (preg_match_all('/if \(' . $loc . '\("([^"]+)", input\)\)/', $record->source, $matches))
+	if (preg_match_all('/if \((?:!filtered && )?' . $loc . '\("([^"]+)", input\)\)/', $record->source, $matches))
 		foreach ($matches[1] as $word)
 			$content .= '<b>Must NOT contain word</b>: ' . "$word<br/>\n";
 
