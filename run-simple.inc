@@ -37,6 +37,7 @@ function boa_query_form($form, &$form_state) {
 			'2' => t('in the title of the article'),
 			'3' => t('in the abstract of the article'),
 			'4' => t('in the body of the article'),
+			'5' => t('in the findings of the article'),
 		),
 	);
 
@@ -132,6 +133,9 @@ function boa_query_form_submit($form, &$form_state) {
 			break;
 		case 4:
 			$searchFunc = "search_body";
+			break;
+		case 5:
+			$searchFunc = "has_finding";
 			break;
 	}
 
