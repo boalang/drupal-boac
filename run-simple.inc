@@ -141,7 +141,8 @@ function boa_query_form_submit($form, &$form_state) {
 
 	if (!empty($form_state['values']['allwords'])) {
 		$query .= "if (!filtered) {\n";
-		$words = asort(preg_split('/\s+/', $form_state['values']['allwords']));
+		$words = preg_split('/\s+/', $form_state['values']['allwords']);
+		asort($words);
 		foreach ($words as $k)
 			$query .= "\tif (!filtered && !$searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
 		$query .= "}\n\n";
@@ -153,7 +154,8 @@ function boa_query_form_submit($form, &$form_state) {
 	}
 	if (!empty($form_state['values']['without'])) {
 		$query .= "if (!filtered) {\n";
-		$words = asort(preg_split('/\s+/', $form_state['values']['without']));
+		$words = preg_split('/\s+/', $form_state['values']['without']);
+		asort($words);
 		foreach ($words as $k)
 			$query .= "\tif (!filtered && $searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
 		$query .= "}\n\n";
