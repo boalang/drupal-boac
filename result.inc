@@ -216,7 +216,7 @@ function get_output($jobId) {
 
 	if ($record->hadoop_status == 2) {
 		if ($record->length > 0) {
-			$trimmed = $record->length > strlen($record->web_result);
+			$trimmed = $record->length > strlen($record->web_result) + 1;
 			$content = "";
 			if ($trimmed) {
 				if ($record->count > 0)
