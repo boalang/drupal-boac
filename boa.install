@@ -225,6 +225,16 @@ function boa_schema() {
                 'type' => 'int',
                 'size' => 'big',
             ),
+            'count' => array(
+                'description' => 'Number of papers in the output.',
+                'type' => 'int',
+                'size' => 'big',
+            ),
+            'web_count' => array(
+                'description' => 'Number of papers in the First part of the output, to display on the web.',
+                'type' => 'int',
+                'size' => 'big',
+            ),
             'hash' => array(
                 'description' => 'Hash of the output, used by API to get file contents.',
                 'type' => 'char',

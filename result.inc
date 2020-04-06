@@ -12,6 +12,7 @@ function boa_result($jobId) {
 	$query->join('boa_output', 'o', 'j.id = o.id');
 	$query->fields('j', array('id', 'uid', 'source', 'deleted', 'public',
 		'compiler_output', 'compiler_status', 'hadoop_status'));
+	$query->fields('o', array('count', 'web_count'));
 	$query->addExpression('(SELECT name FROM boa_input WHERE id = j.input)', 'name');
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
 	$query->addExpression('unix_timestamp(created)', 'created');
@@ -56,7 +57,10 @@ CSS;
 		$content .= '<b>Submitted At:</b> ' . boa_date($record->submitted) . '<br/>';
 	if ($record->hadoop_status == 2) {
 		$content .= '<b>Finished At:</b> ' . boa_date($record->hadoop_end) . " (" . boa_duration($record->finished) . ")<br/>";
-		$content .= '<b>Result Size:</b> ' . formatBytes($record->length) . "<br/>";
+		if ($record->count > 0)
+			$content .= '<b>Papers Found:</b> ' . $record->count . "<br/>";
+		else
+			$content .= '<b>Result Size:</b> ' . formatBytes($record->length) . "<br/>";
 	}
 
 	# -----------------------------------------------
@@ -214,8 +218,12 @@ function get_output($jobId) {
 		if ($record->length > 0) {
 			$trimmed = $record->length > strlen($record->web_result);
 			$content = "";
-			if ($trimmed)
-				$content .= "\nNote: Result is <b>" . formatBytes($record->length) . "</b>, only showing first 64k\n";
+			if ($trimmed) {
+				if ($record->count > 0)
+					$content .= "\nNote: Result is <b>" . $record->count . " papers</b>, only showing first " . $record->web_count . " papers\n";
+				else
+					$content .= "\nNote: Result is <b>" . formatBytes($record->length) . "</b>, only showing first 64k\n";
+			}
 			$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
             $year = -1;
 			foreach ($rows as $row) {
