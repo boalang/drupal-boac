@@ -67,10 +67,8 @@ CSS;
 	if ($record->compiler_status == 0 || $record->compiler_status == 1
 			|| ($record->compiler_status == 2 && ($record->hadoop_status == 0 || $record->hadoop_status == 1))) {
 		$wait = 22000;
-		if ($record->compiler_status == 1 && $record->compile_end > time())
-			$wait = ($record->compile_end - time()) * 1000 + 1000;
-		else if ($record->hadoop_status == 1 && $record->hadoop_end > time())
-			$wait = ($record->hadoop_end - time()) * 1000 + 1000;
+		if (time() - $record->submitted < 5000)
+			$wait = 2000;
 		$content .= <<<JAVASCRIPT
 <script type="text/javascript">
 <!--//--><![CDATA[//><!--
