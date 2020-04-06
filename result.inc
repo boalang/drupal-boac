@@ -12,7 +12,7 @@ function boa_result($jobId) {
 	$query->join('boa_output', 'o', 'j.id = o.id');
 	$query->fields('j', array('id', 'uid', 'source', 'deleted', 'public',
 		'compiler_output', 'compiler_status', 'hadoop_status'));
-	$query->fields('o', array('count', 'web_count'));
+	$query->fields('o', array('count'));
 	$query->addExpression('(SELECT name FROM boa_input WHERE id = j.input)', 'name');
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
 	$query->addExpression('unix_timestamp(created)', 'created');
@@ -208,7 +208,7 @@ function get_output($jobId) {
 	$query = db_select('boa_jobs', 'r');
 	$query->join('boa_output', 'o', 'r.id = o.id');
 	$query->fields('r', array('hadoop_status'));
-	$query->fields('o', array('web_result'));
+	$query->fields('o', array('web_result', 'count', 'web_count'));
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
 	$query->condition('r.id', $jobId);
 
