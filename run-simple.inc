@@ -141,7 +141,8 @@ function boa_query_form_submit($form, &$form_state) {
 
 	if (!empty($form_state['values']['allwords'])) {
 		$query .= "if (!filtered) {\n";
-		foreach (explode(' ', $form_state['values']['allwords']) as $k)
+		$words = asort(explode(' ', $form_state['values']['allwords']));
+		foreach ($words as $k)
 			$query .= "\tif (!filtered && !$searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
 		$query .= "}\n\n";
 	}
@@ -152,7 +153,8 @@ function boa_query_form_submit($form, &$form_state) {
 	}
 	if (!empty($form_state['values']['without'])) {
 		$query .= "if (!filtered) {\n";
-		foreach (explode(' ', $form_state['values']['without']) as $k)
+		$words = asort(explode(' ', $form_state['values']['allwords']));
+		foreach ($words as $k)
 			$query .= "\tif (!filtered && $searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
 		$query .= "}\n\n";
 	}
