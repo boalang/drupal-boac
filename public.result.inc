@@ -60,18 +60,9 @@ function boa_public_result($jobId) {
 </style>
 CSS;
 
-	if ($record->compiler_status == 0 || $record->compiler_status == 1 ||
-			($record->compiler_status == 2 && ($record->hadoop_status == 0 || $record->hadoop_status == 1)))
-		$content .= '<b>Query is currently running</b> <div class="ajax-progress ajax-progress-throbber"><div class="throbber">&nbsp;</div></div><br/>(note: this page automatically reloads)<br/><br/>';
-
 	if ($record->deleted)
 		$content .= '<h2>NOTE: This query is deleted.</h2><br/>';
-	if ($record->public)
-		$content .= '<b>Result is PUBLIC</b>: <a href="?q=boa/result/' . $record->id . '/private">Make Private</a> <a href="?q=boa/result/public/' . $record->id . '">View Public Page</a><br/>';
-	else
-		$content .= '<b>Result is PRIVATE</b>: <a href="?q=boa/result/' . $record->id . '/public">Make Public</a><br/>';
-	if ($user->uid != $record->uid)
-		$content .= '<b>Created By:</b> <a href="?q=user/' . $record->uid . '">' . user_load($record->uid)->name . '</a><br/>';
+	$content .= '<b>Created By:</b> ' . user_load($record->uid)->name . '<br/>';
 	$content .= '<b>Created At:</b> ' . boa_date($record->created) . '<br/>';
 	$content .= '<br/>';
 	$content .= '<b>Input Dataset:</b> ' . $record->name . '<br/>';
