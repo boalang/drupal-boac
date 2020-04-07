@@ -13,6 +13,7 @@ function boa_job_output($jobId) {
 	$query->fields('r', array('hadoop_status'));
 	$query->fields('o', array('web_result'));
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
+	$query->addExpression('COALESCE(CHAR_LENGTH(o.web_result), 0)', 'weblen');
 	$query->condition('r.id', $jobId);
 
 	$record = $query->execute()->fetchObject();
@@ -22,7 +23,7 @@ function boa_job_output($jobId) {
 			$trimmed = $record->length > strlen($record->web_result);
 			$content = "";
 			if ($trimmed)
-				$content .= "\nNote: Output is <b>" . formatBytes($record->length) . "</b>, only showing first 64k\n";
+				$content .= "\nNote: Output is <b>" . formatBytes($record->length) . "</b>, only showing first " . formatBytes($record->weblen) . "\n";
 			$content .= _print_table($record->web_result);
 			if ($trimmed)
 				$content .= "... remaining output not shown, please <a href=\"?q=boa/job/$jobId/download\">download output</a>.\n";

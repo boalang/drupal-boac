@@ -9,6 +9,7 @@ function boa_public_view($jobId) {
 	$query->join('boa_output', 'o', 'j.id = o.id');
 	$query->fields('o', array('web_result'));
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
+	$query->addExpression('COALESCE(CHAR_LENGTH(o.web_result), 0)', 'weblen');
 	$query->fields('j', array('id', 'uid', 'source', 'deleted',
 		'compiler_status', 'hadoop_status'));
 	$query->addExpression('(SELECT name FROM boa_input WHERE id = j.input)', 'name');
@@ -90,7 +91,7 @@ CSS;
 
 			$content .= '<br/>';
 			if ($trimmed)
-				$content .= 'Note: Output is <b>' . formatBytes($record->length) . '</b>, only showing first 64k';
+				$content .= 'Note: Output is <b>' . formatBytes($record->length) . '</b>, only showing first ' . formatBytes($record->weblen);
 			$content .= '<div class="tabs"><ul class="tabs primary">';
 			$content .= '<li><a class="active" href="">Output</a></li>';
 			$content .= '<li><a href="?q=boa/job/public/' . $record->id . '/download">Download Output</a></li>';
