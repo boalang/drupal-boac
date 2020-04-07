@@ -15,7 +15,6 @@ function boa_result($jobId) {
 	$query->fields('o', array('count'));
 	$query->addExpression('(SELECT name FROM boa_input WHERE id = j.input)', 'name');
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
-	$query->addExpression('COALESCE(CHAR_LENGTH(o.web_result), 0)', 'weblen');
 	$query->addExpression('unix_timestamp(created)', 'created');
 	$query->addExpression('unix_timestamp(submitted)', 'submitted');
 	$query->addExpression('unix_timestamp(compile_end)', 'compile_end');
@@ -237,6 +236,7 @@ function get_output($jobId) {
 	$query->fields('r', array('hadoop_status'));
 	$query->fields('o', array('web_result', 'count', 'web_count'));
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
+	$query->addExpression('COALESCE(CHAR_LENGTH(o.web_result), 0)', 'weblen');
 	$query->condition('r.id', $jobId);
 
 	$record = $query->execute()->fetchObject();
