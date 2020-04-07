@@ -36,9 +36,21 @@ function boa_result($jobId) {
 .resultlist {
 }
 
-.findings .para {
-    background-color: #eee;
-    margin: 5px;
+.findings .result {
+	border: 1px solid #d3d3d3;
+	margin-top: 3px;
+}
+
+.findings .result .header {
+    background-color: #d3d3d3;
+    padding: 3px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.findings .result .para {
+    display: none;
+    padding: 5px;
 }
 
 .findings .para b {
@@ -251,6 +263,29 @@ function get_output($jobId) {
 			}
 			if ($trimmed)
 				$content .= "... remaining output not shown, please <a href=\"?q=boa/job/$jobId/download\">download output</a>.\n";
+
+			$content .= <<<JAVASCRIPT
+<script type="text/javascript">
+<!--//--><![CDATA[//><!--
+(function ($) {
+	\$(".findings .para").wrap("<div class=\"result\"></div>");
+	\$(".findings .para").before("<div class=\"header\"><span>&#9660; Expand Result</span></div>");
+
+	\$(".findings .header").click(function () {
+		\$header = \$(this);
+		\$content = \$header.next();
+
+		if (\$content.is(":visible"))
+			\$header.html("&#9660; Expand Result");
+		else
+			\$header.html("&#9650; Collapse Result");
+
+		\$content.slideToggle(300);
+	});
+}(jQuery));
+//--><!]]>
+</script>
+JAVASCRIPT;
 
 			return $content;
 		}
