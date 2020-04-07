@@ -180,7 +180,7 @@ function get_output($jobId) {
 		$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
 	}
 	if ($trimmed)
-		$content .= "... remaining output not shown, please <a href=\"?q=boa/job/$jobId/download\">download output</a>.\n";
+		$content .= "... remaining output not shown, please <a href=\"?q=boa/result/public/$jobId/download\">download output</a>.\n";
 
 	$content .= <<<JAVASCRIPT
 <script type="text/javascript">
