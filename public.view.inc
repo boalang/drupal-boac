@@ -9,7 +9,7 @@ function boa_public_view($jobId) {
 	$query->join('boa_output', 'o', 'j.id = o.id');
 	$query->fields('o', array('web_result'));
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
-	$query->addExpression('COALESCE(CHAR_LENGTH(o.web_result), 0)', 'weblen');
+	$query->addExpression('COALESCE(LENGTH(o.web_result), 0)', 'weblen');
 	$query->fields('j', array('id', 'uid', 'source', 'deleted',
 		'compiler_status', 'hadoop_status'));
 	$query->addExpression('(SELECT name FROM boa_input WHERE id = j.input)', 'name');
@@ -87,7 +87,7 @@ CSS;
 		$content .= '<h2>Output</h2>';
 		$content .= '<b>Job Output Size:</b> ' . formatBytes($record->length) . '<br/>';
 		if ($record->length > 0) {
-			$trimmed = $record->length > strlen($record->web_result);
+			$trimmed = $record->length > $record->weblen;
 
 			$content .= '<br/>';
 			if ($trimmed)

@@ -157,7 +157,10 @@ function get_output($jobId) {
 	if ($record->length <= 0)
 		return "No articles matched the query parameters.\n";
 
-	$trimmed = $record->length > strlen($record->web_result) + 1;
+	if ($record->count > 0)
+		$trimmed = $record->count > $record->web_count;
+	else
+		$trimmed = $record->length > $record->weblen;
 	$content = "";
 	if ($trimmed) {
 		if ($record->count > 0)

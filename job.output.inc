@@ -13,14 +13,14 @@ function boa_job_output($jobId) {
 	$query->fields('r', array('hadoop_status'));
 	$query->fields('o', array('web_result'));
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
-	$query->addExpression('COALESCE(CHAR_LENGTH(o.web_result), 0)', 'weblen');
+	$query->addExpression('COALESCE(LENGTH(o.web_result), 0)', 'weblen');
 	$query->condition('r.id', $jobId);
 
 	$record = $query->execute()->fetchObject();
 
 	if ($record->hadoop_status == 2) {
 		if ($record->length > 0) {
-			$trimmed = $record->length > strlen($record->web_result);
+			$trimmed = $record->length > $record->weblen;
 			$content = "";
 			if ($trimmed)
 				$content .= "\nNote: Output is <b>" . formatBytes($record->length) . "</b>, only showing first " . formatBytes($record->weblen) . "\n";
