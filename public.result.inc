@@ -3,9 +3,6 @@
 function boa_public_result($jobId) {
 	global $user;
 
-	if (!isValidJob($jobId))
-		invalidJob($jobId);
-
 	drupal_set_title(t('Result ') . $jobId);
 
 	$query = db_select('boa_jobs', 'j');
