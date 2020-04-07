@@ -393,6 +393,17 @@ function boa_menu() {
 		'file' => 'result.public.inc',
 	);
 
+	$items['boa/result/public/%/download'] = array(
+		'title' => t('Download Result Output'),
+		'weight' => 5,
+		'page callback' => 'boa_public_download',
+		'page arguments' => array(3),
+		'access callback' => 'boa_public_access',
+		'access arguments' => array(3),
+		'type' => MENU_LOCAL_TASK,
+		'file' => 'public.download.inc',
+	);
+
 	$items['boa/result/%/private'] = array(
 		'title' => t('Make Result Private'),
 		'weight' => -1,
