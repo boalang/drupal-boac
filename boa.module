@@ -373,6 +373,35 @@ function boa_menu() {
 		'file' => 'job.inc',
 	);
 
+	$items['boa/result/public/%'] = array(
+		'title' => t('Boa Result Status'),
+		'page callback' => 'boa_public_result',
+		'page arguments' => array(3),
+		'access callback' => 'boa_public_access',
+		'access arguments' => array(3),
+		'type' => MENU_CALLBACK,
+		'file' => 'public.result.inc',
+	);
+
+	$items['boa/result/%/public'] = array(
+		'title' => t('Make Result Public'),
+		'weight' => -1,
+		'page callback' => 'boa_result_public',
+		'page arguments' => array(2),
+		'access callback' => 'boa_job_not_deleted_access',
+		'access arguments' => array(2),
+		'file' => 'result.public.inc',
+	);
+
+	$items['boa/result/%/private'] = array(
+		'title' => t('Make Result Private'),
+		'weight' => -1,
+		'page callback' => 'boa_result_private',
+		'page arguments' => array(2),
+		'access callback' => 'boa_job_not_deleted_access',
+		'access arguments' => array(2),
+		'file' => 'result.public.inc',
+	);
 
 	$items['boa/job/%'] = array(
 		'title' => t('Job Status'),

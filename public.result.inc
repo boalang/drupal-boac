@@ -1,6 +1,6 @@
 <?php
 
-function boa_result($jobId) {
+function boa_public_result($jobId) {
 	global $user;
 
 	if (!isValidJob($jobId))
@@ -10,8 +10,8 @@ function boa_result($jobId) {
 
 	$query = db_select('boa_jobs', 'j');
 	$query->join('boa_output', 'o', 'j.id = o.id');
-	$query->fields('j', array('id', 'uid', 'source', 'deleted', 'public',
-		'compiler_output', 'compiler_status', 'hadoop_status'));
+	$query->fields('j', array('id', 'uid', 'source', 'deleted', 'submitted',
+		'public', 'compiler_status', 'hadoop_status'));
 	$query->fields('o', array('count'));
 	$query->addExpression('(SELECT name FROM boa_input WHERE id = j.input)', 'name');
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
@@ -91,87 +91,6 @@ CSS;
 
 	# -----------------------------------------------
 
-	$form = drupal_get_form('update_form', $jobId);
-	$content .= drupal_render($form);
-
-	if ($record->compiler_status == 0 || $record->compiler_status == 1
-			|| ($record->compiler_status == 2 && ($record->hadoop_status == 0 || $record->hadoop_status == 1))) {
-		$wait = 22000;
-		if (time() - $record->submitted < 5000)
-			$wait = 2000;
-		$content .= <<<JAVASCRIPT
-<script type="text/javascript">
-<!--//--><![CDATA[//><!--
-var jobTimer = setInterval(function (){
-	location.reload();
-}, $wait);
-//--><!]]>
-</script>
-JAVASCRIPT;
-	}
-
-	return $content;
-}
-
-function update_form($form, &$form_state, $jobId) {
-	$form['run'] = array(
-		'#type' => 'submit',
-		'#value' => "Refresh Job $jobId",
-		'#ajax' => array(
-			'callback' => 'update_form_callback',
-			'wrapper' => 'update_box',
-			'progress' => array(
-				'type' => 'progress'
-			),
-			'effect' => 'fade',
-		),
-		'#prefix' => '<div style="display: none;">',
-		'#suffix' => '</div>',
-	);
-
-	$form['content'] = array(
-		'#markup' => generate_content($jobId),
-	);
-
-	$form['#prefix'] = '<div id="update_box">';
-	$form['#suffix'] = '</div>';
-
-	return $form;
-}
-
-function update_form_callback($form, $form_state) {
-	$form['content']['#markup'] = generate_content($form);
-	return $form;
-}
-
-function generate_content($jobId) {
-	global $user;
-
-	if (is_array($jobId))
-		$jobId = substr(strrchr($jobId['#action'], '/'), 1);
-
-	if (!isValidJob($jobId))
-		return t('Problem loading job status.');
-
-	$query = db_select('boa_jobs', 'r');
-	$query->fields('r', array('id', 'uid', 'source', 'submitted',
-		'compiler_status', 'compiler_output',
-		'hadoop_status', 'hadoop_output'));
-	$query->addExpression('unix_timestamp(compile_start)', 'compile_start');
-	$query->addExpression('unix_timestamp(compile_end)', 'compile_end');
-	$query->addExpression('unix_timestamp(hadoop_start)', 'hadoop_start');
-	$query->addExpression('unix_timestamp(hadoop_end)', 'hadoop_end');
-	$query->addExpression('unix_timestamp(hadoop_end) - unix_timestamp(hadoop_start)', 'hadoop_span');
-	$query->addExpression('unix_timestamp(compile_end) - unix_timestamp(compile_start)', 'compile_span');
-	$query->condition('id', $jobId);
-	$result = $query->execute();
-
-	$record = $result->fetchObject();
-
-	$content = '';
-
-	# -----------------------------------------------
-
 	$content .= '<h2>Query Parameters</h2>';
 
 	$loc = 'search_paper';
@@ -231,44 +150,48 @@ function generate_content($jobId) {
 }
 
 function get_output($jobId) {
-	$query = db_select('boa_jobs', 'r');
-	$query->join('boa_output', 'o', 'r.id = o.id');
-	$query->fields('r', array('hadoop_status'));
+	$query = db_select('boa_jobs', 'j');
+	$query->join('boa_output', 'o', 'j.id = o.id');
+	$query->fields('j', array('hadoop_status'));
 	$query->fields('o', array('web_result', 'count', 'web_count'));
 	$query->addExpression('COALESCE(o.length, 0)', 'length');
-	$query->condition('r.id', $jobId);
+	$query->condition('j.id', $jobId);
 
 	$record = $query->execute()->fetchObject();
 
-	if ($record->hadoop_status == 2) {
-		if ($record->length > 0) {
-			$trimmed = $record->length > strlen($record->web_result) + 1;
-			$content = "";
-			if ($trimmed) {
-				if ($record->count > 0)
-					$content .= "\nNote: Result is <b>" . $record->count . " papers</b>, only showing first " . $record->web_count . " papers\n";
-				else
-					$content .= "\nNote: Result is <b>" . formatBytes($record->length) . "</b>, only showing first 64k\n";
-			}
-			$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
-			$year = -1;
-			foreach ($rows as $row) {
-				$newyear = date("Y") - (int)substr($row, 2, strpos($row, ']'));
-				if ($year != $newyear)
-					$content .= "\t<h3>$newyear</h3>\n";
-				$year = $newyear;
-				$s = linkify(htmlspecialchars($row), array('target' => '_blank'));
-				$s = str_replace('[b]', '<b>', $s);
-				$s = str_replace('[/b]', '</b>', $s);
-				$s = str_replace('[/div]', '</div>', $s);
-				$s = str_replace('[div class=&quot;context&quot;]', '<div class="context">', $s);
-				$s = str_replace('[div class=&quot;para&quot;]', '<div class="para">', $s);
-				$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
-			}
-			if ($trimmed)
-				$content .= "... remaining output not shown, please <a href=\"?q=boa/job/$jobId/download\">download output</a>.\n";
+	if ($record->hadoop_status != 2)
+		return "";
 
-			$content .= <<<JAVASCRIPT
+	if ($record->length <= 0)
+		return "No articles matched the query parameters.\n";
+
+	$trimmed = $record->length > strlen($record->web_result) + 1;
+	$content = "";
+	if ($trimmed) {
+		if ($record->count > 0)
+			$content .= "\nNote: Result is <b>" . $record->count . " papers</b>, only showing first " . $record->web_count . " papers\n";
+		else
+			$content .= "\nNote: Result is <b>" . formatBytes($record->length) . "</b>, only showing first 64k\n";
+	}
+	$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
+	$year = -1;
+	foreach ($rows as $row) {
+		$newyear = date("Y") - (int)substr($row, 2, strpos($row, ']'));
+		if ($year != $newyear)
+			$content .= "\t<h3>$newyear</h3>\n";
+		$year = $newyear;
+		$s = linkify(htmlspecialchars($row), array('target' => '_blank'));
+		$s = str_replace('[b]', '<b>', $s);
+		$s = str_replace('[/b]', '</b>', $s);
+		$s = str_replace('[/div]', '</div>', $s);
+		$s = str_replace('[div class=&quot;context&quot;]', '<div class="context">', $s);
+		$s = str_replace('[div class=&quot;para&quot;]', '<div class="para">', $s);
+		$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
+	}
+	if ($trimmed)
+		$content .= "... remaining output not shown, please <a href=\"?q=boa/job/$jobId/download\">download output</a>.\n";
+
+	$content .= <<<JAVASCRIPT
 <script type="text/javascript">
 <!--//--><![CDATA[//><!--
 (function ($) {
@@ -291,12 +214,7 @@ function get_output($jobId) {
 </script>
 JAVASCRIPT;
 
-			return $content;
-		}
-		return "No articles matched the query parameters.\n";
-	}
-
-	return "";
+	return $content;
 }
 
 ?>
