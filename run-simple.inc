@@ -188,7 +188,7 @@ function boa_query_form_submit($form, &$form_state) {
 			$first = true;
 			foreach ($words as $k) {
 				if (!$first)
-					$source .= " || ";
+					$source .= " && ";
 				$source .= "strfind(\"$k\", lowercase(p.text)) != -1";
 				$first = false;
 			}
