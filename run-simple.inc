@@ -172,9 +172,45 @@ function boa_query_form_submit($form, &$form_state) {
 	}
 
 	$source = "o: output collection[string] of string;\n\n";
-	$source .= "filtered := !def(input.metadata) || !def(input.metadata.doi_url) || !def(input.metadata.publish_time);\n\n";
+	$source .= "filtered := !def(input.metadata) || !def(input.metadata.doi_url) || !def(input.metadata.publish_time);\n";
+	$source .= "context := \"\";\n\n";
 	$source .= $query;
-	$source .= "if (!filtered) o[format(\"%03d\", yearof(now()) - yearof(input.metadata.publish_time))] << pretty_print(input);";
+	if ($searchFunc == "has_finding") {
+		$source .= "if (!filtered) {\n";
+		$source .= "\tcontext = \" [div class=\\\"findings\\\"]\";\n\n";
+
+		$source .= "\tvisit(input, visitor {\n";
+		$source .= "\t\tbefore p: Paragraph -> {\n";
+		$source .= "\t\t\tif (";
+		if (!empty($form_state['values']['allwords'])) {
+			$words = preg_split('/\s+/', trim($form_state['values']['allwords']));
+			asort($words);
+			$first = true;
+			foreach ($words as $k) {
+				if (!$first)
+					$source .= " || ";
+				$source .= "has_finding(\"$k\", p)";
+				$first = false;
+			}
+		}
+		$source .= ")\n";
+		$source .= "\t\t\t\tcontext = context + \"[div class=\\\"para\\\"]\" + p.text + \"[/div]\";\n";
+		$source .= "\t\t}\n";
+		$source .= "\t});\n\n";
+
+		$source .= "\tcontext = context + \"[/div]\";\n";
+		if (!empty($form_state['values']['allwords'])) {
+			$words = preg_split('/\s+/', trim($form_state['values']['allwords']));
+			asort($words);
+			foreach ($words as $k)
+				$source .= "\tcontext = strreplace(context, \"$k\", \"[b]${k}[/b]\", true);\n";
+		}
+
+		$source .= "\n\to[format(\"%03d\", yearof(now()) - yearof(input.metadata.publish_time))] << pretty_print(input) + context;\n";
+		$source .= "}";
+	} else {
+		$source .= "if (!filtered) o[format(\"%03d\", yearof(now()) - yearof(input.metadata.publish_time))] << pretty_print(input) + context;";
+	}
 
 	if (isset($form_state['values']['debug']) && (bool)$form_state['values']['debug'] && is_boa_admin()) {
 		print("<pre>");

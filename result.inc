@@ -35,6 +35,16 @@ function boa_result($jobId) {
 <style type="text/css" media="all">
 .resultlist {
 }
+
+.findings .para {
+    background-color: #eee;
+    margin: 5px;
+}
+
+.findings .para b {
+    color: #e00;
+    font-weight: bold;
+}
 </style>
 CSS;
 
@@ -232,6 +242,11 @@ function get_output($jobId) {
                     $content .= "\t<h3>$newyear</h3>\n";
                 $year = $newyear;
 				$s = linkify(htmlspecialchars($row), array('target' => '_blank'));
+				$s = str_replace('[b]', '<b>', $s);
+				$s = str_replace('[/b]', '</b>', $s);
+				$s = str_replace('[/div]', '</div>', $s);
+				$s = str_replace('[div class=&quot;findings&quot;]', '<div class="findings">', $s);
+				$s = str_replace('[div class=&quot;para&quot;]', '<div class="para">', $s);
 				$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
 			}
 			if ($trimmed)
