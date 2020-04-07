@@ -177,7 +177,7 @@ function boa_query_form_submit($form, &$form_state) {
 	$source .= $query;
 	if ($searchFunc == "has_finding") {
 		$source .= "if (!filtered) {\n";
-		$source .= "\tcontext = \" [div class=\\\"findings\\\"]\";\n\n";
+		$source .= "\tcontext = \" [div class=\\\"context\\\"]\";\n\n";
 
 		$source .= "\tvisit(input, visitor {\n";
 		$source .= "\t\tbefore p: Paragraph -> {\n";

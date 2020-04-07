@@ -36,24 +36,24 @@ function boa_result($jobId) {
 .resultlist {
 }
 
-.findings .result {
+.context .result {
 	border: 1px solid #d3d3d3;
 	margin-top: 3px;
 }
 
-.findings .result .header {
+.context .result .header {
     background-color: #d3d3d3;
     padding: 3px;
     cursor: pointer;
     font-weight: bold;
 }
 
-.findings .result .para {
+.context .result .para {
     display: none;
     padding: 5px;
 }
 
-.findings .para b {
+.context .para b {
     color: #e00;
     font-weight: bold;
 }
@@ -257,7 +257,7 @@ function get_output($jobId) {
 				$s = str_replace('[b]', '<b>', $s);
 				$s = str_replace('[/b]', '</b>', $s);
 				$s = str_replace('[/div]', '</div>', $s);
-				$s = str_replace('[div class=&quot;findings&quot;]', '<div class="findings">', $s);
+				$s = str_replace('[div class=&quot;context&quot;]', '<div class="context">', $s);
 				$s = str_replace('[div class=&quot;para&quot;]', '<div class="para">', $s);
 				$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
 			}
@@ -268,10 +268,10 @@ function get_output($jobId) {
 <script type="text/javascript">
 <!--//--><![CDATA[//><!--
 (function ($) {
-	\$(".findings .para").wrap("<div class=\"result\"></div>");
-	\$(".findings .para").before("<div class=\"header\"><span>&#9660; Expand Result</span></div>");
+	\$(".context .para").wrap("<div class=\"result\"></div>");
+	\$(".context .para").before("<div class=\"header\"><span>&#9660; Expand Result</span></div>");
 
-	\$(".findings .header").click(function () {
+	\$(".context .header").click(function () {
 		\$header = \$(this);
 		\$content = \$header.next();
 
