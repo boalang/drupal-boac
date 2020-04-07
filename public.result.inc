@@ -69,13 +69,8 @@ CSS;
 		$content .= '<b>Submitted At:</b> ' . boa_date($record->submitted) . ' (' . boa_duration(time() - $record->submitted) .')<br/>';
 	else
 		$content .= '<b>Submitted At:</b> ' . boa_date($record->submitted) . '<br/>';
-	if ($record->hadoop_status == 2) {
+	if ($record->hadoop_status == 2)
 		$content .= '<b>Finished At:</b> ' . boa_date($record->hadoop_end) . " (" . boa_duration($record->finished) . ")<br/>";
-		if ($record->count > 0)
-			$content .= '<b>Papers Found:</b> ' . $record->count . "<br/>";
-		else
-			$content .= '<b>Result Size:</b> ' . formatBytes($record->length) . "<br/>";
-	}
 
 	# -----------------------------------------------
 
@@ -127,10 +122,7 @@ CSS;
 
 	# -----------------------------------------------
 
-	if ($record->hadoop_status == 2) {
-		$content .= '<h2>Result</h2>';
-		$content .= "<ul class=\"resultlist\">\n" . get_output($jobId) . "</ul>\n";
-	}
+	$content .= get_output($jobId);
 
 	# -----------------------------------------------
 
@@ -148,30 +140,43 @@ function get_output($jobId) {
 
 	$record = $query->execute()->fetchObject();
 
+	$content = "";
+
 	if ($record->hadoop_status != 2)
-		return "";
+		return $content;
 
 	if ($record->length <= 0)
 		return "No articles matched the query parameters.\n";
+
+	$content .= "<h2>Result</h2>\n";
+
+	if ($record->count > 0)
+		$content .= '<h3>Papers Found: ' . $record->count . "</h3>\n";
+	else
+		$content .= '<h3>Result Size: ' . formatBytes($record->length) . "</h3>\n";
 
 	if ($record->count > 0)
 		$trimmed = $record->count > $record->web_count;
 	else
 		$trimmed = $record->length > $record->weblen;
-	$content = "";
+
 	if ($trimmed) {
 		if ($record->count > 0)
 			$content .= "\nNote: Result is <b>" . $record->count . " papers</b>, only showing first " . $record->web_count . " papers\n";
 		else
 			$content .= "\nNote: Result is <b>" . formatBytes($record->length) . "</b>, only showing first " . formatBytes($record->weblen) . "\n";
 	}
+
 	$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
 	$year = -1;
 	foreach ($rows as $row) {
 		$newyear = date("Y") - (int)substr($row, 2, strpos($row, ']'));
-		if ($year != $newyear)
-			$content .= "\t<h3>$newyear</h3>\n";
-		$year = $newyear;
+		if ($year != $newyear) {
+			if ($year != -1)
+				$content .= "</ul>\n";
+			$content .= "\t<h3>$newyear</h3>\n<ul class=\"resultlist\">\n";
+			$year = $newyear;
+		}
 		$s = linkify(htmlspecialchars($row), array('target' => '_blank'));
 		$s = str_replace('[b]', '<b>', $s);
 		$s = str_replace('[/b]', '</b>', $s);
@@ -180,6 +185,7 @@ function get_output($jobId) {
 		$s = str_replace('[div class=&quot;para&quot;]', '<div class="para">', $s);
 		$content .= "\t<li>" . substr($s, strpos($s, '] = ') + 4) . "</li>\n";
 	}
+	$content .= "</ul>\n";
 	if ($trimmed)
 		$content .= "... remaining output not shown, please <a href=\"?q=boa/result/public/$jobId/download\">download output</a>.\n";
 
