@@ -243,6 +243,7 @@ function boa_schema() {
             'web_result' => array(
                 'description' => 'First part of the output, to display on the web.',
                 'type' => 'text',
+                'size' => 'medium',
             ),
         ),
     );
