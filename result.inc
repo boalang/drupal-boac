@@ -240,21 +240,23 @@ function get_output($jobId) {
 			$content .= "<h2>Result</h2>\n";
 
 			if ($record->count > 0)
-				$content .= '<h3>Papers Found: ' . $record->count . "</h3>\n";
-			else
-				$content .= '<h3>Result Size: ' . formatBytes($record->length) . "</h3>\n";
-
-			if ($record->count > 0)
 				$trimmed = $record->count > $record->web_count;
 			else
 				$trimmed = $record->length > $record->weblen;
 
-			if ($trimmed) {
-				if ($record->count > 0)
-					$content .= "\nNote: Result is <b>" . $record->count . " papers</b>, only showing first " . $record->web_count . " papers\n";
-				else
-					$content .= "\nNote: Result is <b>" . formatBytes($record->length) . "</b>, only showing first " . formatBytes($record->weblen) . "\n";
+			if ($record->count > 0) {
+				$content .= '<h3>Papers Found: ' . $record->count;
+				if ($trimmed)
+					$content .= " (note: only showing first " . $record->web_count . " papers)";
+				$content .= "</h3>\n";
+			} else {
+				$content .= '<h3>Result Size: ' . formatBytes($record->length);
+				if ($trimmed)
+					$content .= " (note: only showing first " . formatBytes($record->weblen) . ")";
+				$content .= "</h3>\n";
 			}
+
+			$content .= "<a href=\"javascript:showAll();\">&#9660; Expand All Results</a><br/>\n";
 
 			$rows = explode("\n", substr($record->web_result, 0, strrpos($record->web_result, "\n")));
 			$year = -1;
@@ -294,9 +296,19 @@ function get_output($jobId) {
 		else
 			\$header.html("&#9650; Collapse Result");
 
-		\$content.slideToggle(300);
+		\$content.slideToggle("fast");
 	});
 }(jQuery));
+
+function showAll() {
+	(function ($) {
+		\$(".context .header").each(function () {
+			\$header = \$(this);
+			\$header.html("&#9650; Collapse Result");
+			\$header.next().slideDown("fast");
+		});
+	}(jQuery));
+}
 //--><!]]>
 </script>
 JAVASCRIPT;
