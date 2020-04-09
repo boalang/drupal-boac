@@ -115,7 +115,8 @@ function boa_query_form_submit($form, &$form_state) {
 		drupal_exit();
 	}
 
-	$query = '';
+	$source = "o: output collection[string] of string;\n\n";
+	$source .= "filtered := !def(input.metadata) || !def(input.metadata.doi_url) || !def(input.metadata.publish_time);\n\n";
 
 	$loc = isset($form_state['values']['loc']) ? (int)$form_state['values']['loc'] : -1;
 	switch ($loc) {
@@ -140,73 +141,82 @@ function boa_query_form_submit($form, &$form_state) {
 	}
 
 	if (!empty($form_state['values']['allwords'])) {
-		$query .= "if (!filtered) {\n";
+		$source .= "if (!filtered) {\n";
 		$words = preg_split('/\s+/', trim($form_state['values']['allwords']));
 		asort($words);
 		foreach ($words as $k)
-			$query .= "\tif (!filtered && !$searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
-		$query .= "}\n\n";
+			$source .= "\tif (!filtered && !$searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
+		$source .= "}\n\n";
 	}
 	if (!empty($form_state['values']['phrase'])) {
-		$query .= "if (!filtered) {\n";
-		$query .= "\tif (!filtered && !$searchFunc(\"" . trim($form_state['values']['phrase']) . "\", input))\n\t\tfiltered = true;\n";
-		$query .= "}\n\n";
+		$source .= "if (!filtered) {\n";
+		$source .= "\tif (!filtered && !$searchFunc(\"" . trim($form_state['values']['phrase']) . "\", input))\n\t\tfiltered = true;\n";
+		$source .= "}\n\n";
 	}
 	if (!empty($form_state['values']['without'])) {
-		$query .= "if (!filtered) {\n";
+		$source .= "if (!filtered) {\n";
 		$words = preg_split('/\s+/', trim($form_state['values']['without']));
 		asort($words);
 		foreach ($words as $k)
-			$query .= "\tif (!filtered && $searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
-		$query .= "}\n\n";
+			$source .= "\tif (!filtered && $searchFunc(\"$k\", input))\n\t\tfiltered = true;\n";
+		$source .= "}\n\n";
 	}
 	if (!empty($form_state['values']['start'])) {
-		$query .= "if (!filtered) {\n";
-		$query .= "\tif (yearof(input.metadata.publish_time) < " . $form_state['values']['start'] . ")\n\t\tfiltered = true;\n";
-		$query .= "}\n\n";
+		$source .= "if (!filtered) {\n";
+		$source .= "\tif (yearof(input.metadata.publish_time) < " . $form_state['values']['start'] . ")\n\t\tfiltered = true;\n";
+		$source .= "}\n\n";
 	}
 	if (!empty($form_state['values']['end'])) {
-		$query .= "if (!filtered) {\n";
-		$query .= "\tif (yearof(input.metadata.publish_time) > " . $form_state['values']['end'] . ")\n\t\tfiltered = true;\n";
-		$query .= "}\n\n";
+		$source .= "if (!filtered) {\n";
+		$source .= "\tif (yearof(input.metadata.publish_time) > " . $form_state['values']['end'] . ")\n\t\tfiltered = true;\n";
+		$source .= "}\n\n";
 	}
 
-	$source = "o: output collection[string] of string;\n\n";
-	$source .= "filtered := !def(input.metadata) || !def(input.metadata.doi_url) || !def(input.metadata.publish_time);\n";
-	$source .= "context := \"\";\n\n";
-	$source .= $query;
-	if ($searchFunc == "has_finding") {
+	if (!empty($form_state['values']['allwords']) || !empty($form_state['values']['phrase'])) {
 		$source .= "if (!filtered) {\n";
-		$source .= "\tcontext = \" [div class=\\\"context\\\"]\";\n\n";
+		$source .= "\tcontext := \"\";\n\n";
 
 		$source .= "\tvisit(input, visitor {\n";
 		$source .= "\t\tbefore p: Paragraph -> {\n";
+		$source .= "\t\t\tlc := lowercase(p.text);\n\n";
 		$source .= "\t\t\tif (";
 		if (!empty($form_state['values']['allwords'])) {
-			$words = preg_split('/\s+/', trim($form_state['values']['allwords']));
+			$words = preg_split('/\s+/', strtolower(trim($form_state['values']['allwords'])));
 			asort($words);
 			$first = true;
 			foreach ($words as $k) {
 				if (!$first)
-					$source .= " && ";
-				$source .= "strfind(\"$k\", lowercase(p.text)) != -1";
+					$source .= "\n\t\t\t\t\t|| ";
+				$source .= "strfind(\"$k\", lc) != -1";
 				$first = false;
 			}
+			if (!empty($form_state['values']['phrase']))
+				$source .= "\n\t\t\t\t\t|| ";
 		}
+		if (!empty($form_state['values']['phrase']))
+			$source .= "strfind(\"" . strtolower($form_state['values']['phrase']) . "\", lc) != -1";
 		$source .= ")\n";
 		$source .= "\t\t\t\tcontext = context + \"[div class=\\\"para\\\"]\" + p.text + \"[/div]\";\n";
 		$source .= "\t\t}\n";
 		$source .= "\t});\n\n";
 
-		$source .= "\tcontext = context + \"[/div]\";\n";
+		$source .= "\tif (len(context) > 0) {\n";
 		if (!empty($form_state['values']['allwords'])) {
-			$words = preg_split('/\s+/', trim($form_state['values']['allwords']));
+			$words = preg_split('/\s+/', strtolower(trim($form_state['values']['allwords'])));
 			asort($words);
+			$source .= "\t\tcontext = hilite_phrases(context";
 			foreach ($words as $k)
-				$source .= "\tcontext = strreplace(context, \"$k\", \"[b]${k}[/b]\", true);\n";
+				$source .= ", \"$k\"";
+			$source .= ");\n";
 		}
 
-		$source .= "\n\to[format(\"%03d\", yearof(now()) - yearof(input.metadata.publish_time))] << pretty_print(input) + context;\n";
+		if (!empty($form_state['values']['phrase']))
+			$source .= "\t\tcontext = hilite_phrases(context, \"" . strtolower($form_state['values']['phrase']) . "\");\n";
+
+		$source .= "\t\tcontext = \" [div class=\\\"context\\\"]\" + context + \"[/div]\";\n";
+		$source .= "\t}\n\n";
+
+		$source .= "\to[format(\"%03d\", yearof(now()) - yearof(input.metadata.publish_time))] << pretty_print(input) + context;\n";
 		$source .= "}";
 	} else {
 		$source .= "if (!filtered) o[format(\"%03d\", yearof(now()) - yearof(input.metadata.publish_time))] << pretty_print(input) + context;";
